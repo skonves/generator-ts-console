@@ -1,6 +1,6 @@
-# Typescripe Console App Generator
+# Typescript Console App Generator
 
-* Typescripe 2.0
+* Typescript 2.0
 * Code formatting with Prettier and TSLint
 * Unit testing with Mocha and Chai
 * Code coverage with NYC
