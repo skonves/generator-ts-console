@@ -31,9 +31,22 @@ module.exports = class extends Generator {
       {
         name: this.pkg.name || "typescript-application",
         version: this.pkg.version || "0.0.1",
-        description: this.pkg.description || "",
+        description:
+          this.pkg.description ||
+          "Base project for creating a console application in Typescript",
         author: this.pkg.author || "",
         license: this.pkg.license || "ISC"
+      }
+    );
+
+    this.fs.copyTpl(
+      this.templatePath("README.md"),
+      this.destinationPath("README.md"),
+      {
+        name: this.pkg.name || "Typescript Application",
+        description:
+          this.pkg.description ||
+          "Base project for creating a console application in Typescript"
       }
     );
   }
