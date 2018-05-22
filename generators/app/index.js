@@ -3,6 +3,12 @@
 const Generator = require("yeoman-generator");
 
 module.exports = class extends Generator {
+  constructor(args, opts) {
+    super(args, opts);
+
+    this.option("code", { type: Boolean, default: true });
+  }
+
   initializing() {
     this.pkg = this.fs.readJSON(this.destinationPath("package.json"), {});
 
@@ -18,12 +24,16 @@ module.exports = class extends Generator {
       "tsconfig.json",
       "tslint.json",
       ".gitignore",
-      ".nycrc",
-      "src/index.ts",
-      "src/index.tests.ts"
+      ".nycrc"
     ].forEach(file => {
       this.fs.copy(this.templatePath(file), this.destinationPath(file));
     });
+
+    if (this.options.code) {
+      ["src/index.ts", "src/index.tests.ts"].forEach(file => {
+        this.fs.copy(this.templatePath(file), this.destinationPath(file));
+      });
+    }
 
     this.fs.copyTpl(
       this.templatePath("package.json"),
