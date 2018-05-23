@@ -19,15 +19,14 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    [
-      ".prettierrc",
-      "tsconfig.json",
-      "tslint.json",
-      ".gitignore",
-      ".nycrc"
-    ].forEach(file => {
+    [".prettierrc", "tsconfig.json", "tslint.json", ".nycrc"].forEach(file => {
       this.fs.copy(this.templatePath(file), this.destinationPath(file));
     });
+
+    this.fs.copy(
+      this.templatePath("gitignore"),
+      this.destinationPath(".gitignore")
+    );
 
     if (this.options.code) {
       ["src/index.ts", "src/index.tests.ts"].forEach(file => {
