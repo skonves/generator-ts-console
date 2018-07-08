@@ -9,6 +9,5 @@
 
 ### Run this generator
 
-1.  Clone this repo
-1.  From the root of this repo, run `npm link` (this will install the generator as a global package)
-1.  From the root of your new project, run `yo ts-console`
+1.  Globally install this generator: `npm install -g generator-ts-console`
+1.  From the root of your new project, run `yo ts-console` (NOTE: run `yo ts-console --help` for options)
