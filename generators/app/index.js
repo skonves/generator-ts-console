@@ -6,7 +6,8 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.option("code", { type: Boolean, default: true });
+    this.option("code", { type: Boolean, default: true, description: "Adds example code and tests to the project" });
+    this.option("vscode", { type: Boolean, default: false, description: "Adds launch configurations for Visual Studio Code" });
   }
 
   initializing() {
@@ -27,6 +28,12 @@ module.exports = class extends Generator {
       this.templatePath("gitignore"),
       this.destinationPath(".gitignore")
     );
+
+    if (this.options.vscode) {
+      [".vscode/launch.json"].forEach(file => {
+        this.fs.copy(this.templatePath(file), this.destinationPath(file));
+      });
+    }
 
     if (this.options.code) {
       ["src/index.ts", "src/index.tests.ts"].forEach(file => {
