@@ -4,7 +4,7 @@ node_js:
   - 'lts/*'       #10.x - Active LTS
   - 'stable'      #12.x - Current Release
 before_install:
-  - '[[ `npm --version` =~ ^[1-5]\. ]] && npm i -g npm@6'
+  - npm i -g npm@latest
 install:
   - npm ci
 script:
