@@ -1,6 +1,6 @@
 # Typescript Console App Generator
 
-* Typescript 2.0
+* Typescript 3.0
 * Code formatting with Prettier and TSLint
 * Unit testing with Mocha and Chai
 * Code coverage with NYC
