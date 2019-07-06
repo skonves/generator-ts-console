@@ -28,6 +28,32 @@ describe('ts-console:app', function() {
     rimraf(tempdir, () => done());
   });
 
+  describe('ci prompt', () => {
+    it('creates a .travis.yml file if travis is selected', async () => {
+      // ARRANGE
+      const ci = 'Travis CI (travis-ci.org)';
+
+      // ACT
+      await helpers
+        .run(__dirname)
+        .withPrompts({ ci })
+        .inDir(tempdir);
+
+      // ASSERT
+      assert.file(path.join(tempdir, '.travis.yml'));
+    });
+
+    it('does not create a .travis.yml file if no input is selected', async () => {
+      // ARRANGE
+
+      // ACT
+      await helpers.run(__dirname).inDir(tempdir);
+
+      // ASSERT
+      assert.noFile(path.join(tempdir, '.travis.yml'));
+    });
+  });
+
   describe('vscode option', () => {
     it('creates a .vscode config folder when true', async () => {
       // ARRANGE

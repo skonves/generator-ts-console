@@ -17,6 +17,13 @@ module.exports = class extends Generator {
     });
   }
 
+  private answers: Record<string, any>;
+
+  private readonly ci = {
+    travis: 'Travis CI (travis-ci.org)',
+    none: 'none',
+  };
+
   initializing() {
     this.pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
 
@@ -24,6 +31,18 @@ module.exports = class extends Generator {
       console.log('Found existing package.json:');
       console.log(this.pkg);
     }
+  }
+
+  async prompting() {
+    this.answers = await this.prompt([
+      {
+        type: 'rawlist',
+        name: 'ci',
+        message: 'Which CI tooling will you use?',
+        choices: [this.ci.travis, this.ci.none],
+        default: 0,
+      },
+    ]);
   }
 
   writing() {
@@ -52,6 +71,15 @@ module.exports = class extends Generator {
 
     if (this.options.code) {
       [join('src', 'index.tests.ts'), join('src', 'index.ts')].forEach(file => {
+        this.fs.copy(
+          this.templatePath(file + '.template'),
+          this.destinationPath(file),
+        );
+      });
+    }
+
+    if (this.answers['ci'] === this.ci.travis) {
+      ['.travis.yml'].forEach(file => {
         this.fs.copy(
           this.templatePath(file + '.template'),
           this.destinationPath(file),
