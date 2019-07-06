@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "lib": ["es6"],
+    "module": "commonjs",
+    "noImplicitReturns": true,
+    "outDir": "generators",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "target": "es6",
+    "declaration": true
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.tests.ts", "src/*/templates/*"]
+}
