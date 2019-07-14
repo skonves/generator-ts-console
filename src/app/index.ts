@@ -45,7 +45,7 @@ module.exports = class extends Generator {
     ]);
   }
 
-  writing() {
+  configuring() {
     [
       // Root
       '.gitignore',
@@ -62,15 +62,6 @@ module.exports = class extends Generator {
 
     if (this.options.vscode) {
       [join('.vscode', 'launch.json')].forEach(file => {
-        this.fs.copy(
-          this.templatePath(file + '.template'),
-          this.destinationPath(file),
-        );
-      });
-    }
-
-    if (this.options.code) {
-      [join('src', 'index.tests.ts'), join('src', 'index.ts')].forEach(file => {
         this.fs.copy(
           this.templatePath(file + '.template'),
           this.destinationPath(file),
@@ -102,6 +93,17 @@ module.exports = class extends Generator {
         },
       );
     });
+  }
+
+  writing() {
+    if (this.options.code) {
+      [join('src', 'index.tests.ts'), join('src', 'index.ts')].forEach(file => {
+        this.fs.copy(
+          this.templatePath(file + '.template'),
+          this.destinationPath(file),
+        );
+      });
+    }
   }
 
   install() {
