@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-  - 'lts/carbon'  #8.x  - Maintenance LTS
-  - 'lts/*'       #10.x - Active LTS
-  - 'stable'      #12.x - Current Release
+  - 'lts/*'       # Active LTS
+  - 'stable'      # Current Release
 install:
   - npm ci
 script:
