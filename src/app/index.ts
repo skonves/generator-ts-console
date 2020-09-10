@@ -109,7 +109,7 @@ module.exports = class extends Generator {
   install() {
     this.npmInstall(
       [
-        'typescript@3',
+        'typescript@4',
         '@types/node',
         'prettier',
         'tslint',
