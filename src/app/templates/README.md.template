@@ -1,4 +1,4 @@
-# <%= name %>
+<%= badges %># <%= name %>
 
 <%= description %>
 

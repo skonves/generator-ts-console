@@ -43,6 +43,20 @@ describe('ts-console:app', function() {
       assert.file(path.join(tempdir, '.travis.yml'));
     });
 
+    it('creates a GitHub workflow file if GitHub is selected', async () => {
+      // ARRANGE
+      const ci = 'GitHub Action';
+
+      // ACT
+      await helpers
+        .run(__dirname)
+        .withPrompts({ ci })
+        .inDir(tempdir);
+
+      // ASSERT
+      assert.file(path.join(tempdir, '.github', 'workflows', 'build.yml'));
+    });
+
     it('does not create a .travis.yml file if no input is selected', async () => {
       // ARRANGE
 

@@ -20,6 +20,7 @@ module.exports = class extends Generator {
   private answers: Record<string, any>;
 
   private readonly ci = {
+    github: 'GitHub Action',
     travis: 'Travis CI (travis-ci.org)',
     none: 'none',
   };
@@ -39,7 +40,7 @@ module.exports = class extends Generator {
         type: 'rawlist',
         name: 'ci',
         message: 'Which CI tooling will you use?',
-        choices: [this.ci.travis, this.ci.none],
+        choices: [this.ci.github, this.ci.travis, this.ci.none],
         default: 0,
       },
     ]);
@@ -69,6 +70,8 @@ module.exports = class extends Generator {
       });
     }
 
+    let badges = '';
+
     if (this.answers['ci'] === this.ci.travis) {
       ['.travis.yml'].forEach(file => {
         this.fs.copy(
@@ -76,6 +79,16 @@ module.exports = class extends Generator {
           this.destinationPath(file),
         );
       });
+    } else if (this.answers['ci'] === this.ci.github) {
+      ['.github/workflows/build.yml'].forEach(file => {
+        this.fs.copy(
+          this.templatePath(file + '.template'),
+          this.destinationPath(file),
+        );
+      });
+
+      badges =
+        '![master](https://github.com/{ORG_NAME}/{REPO_NAME}/workflows/build/badge.svg?branch=master&event=push)\n\n';
     }
 
     ['package.json', 'README.md'].forEach(file => {
@@ -83,6 +96,7 @@ module.exports = class extends Generator {
         this.templatePath(file + '.template'),
         this.destinationPath(file),
         {
+          badges,
           name: this.pkg.name || 'typescript-application',
           version: this.pkg.version || '0.0.1',
           description:
