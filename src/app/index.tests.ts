@@ -108,15 +108,16 @@ describe('ts-console:app', function() {
     });
   });
 
-  describe('code option', () => {
-    it('creates an index.ts file with tests when true', async () => {
+  describe('code prompt', () => {
+    it('creates an index.ts file with tests when "Example code and tests"', async () => {
       // ARRANGE
-      const code = true;
+      const code = 'Example code and tests';
+      const testLib = 'Jest';
 
       // ACT
       await helpers
         .run(__dirname)
-        .withOptions({ code })
+        .withPrompts({ code, testLib })
         .inDir(tempdir);
 
       // ASSERT
@@ -124,25 +125,15 @@ describe('ts-console:app', function() {
       assert.file(path.join(tempdir, 'src', 'index.tests.ts'));
     });
 
-    it('creates an index.ts file with tests when not provided', async () => {
+    it('does not create an index.ts file with tests when "Empty project only"', async () => {
       // ARRANGE
-
-      // ACT
-      await helpers.run(__dirname).inDir(tempdir);
-
-      // ASSERT
-      assert.file(path.join(tempdir, 'src', 'index.ts'));
-      assert.file(path.join(tempdir, 'src', 'index.tests.ts'));
-    });
-
-    it('does not create an index.ts file with tests when false', async () => {
-      // ARRANGE
-      const code = false;
+      const code = 'Empty project only';
+      const testLib = 'Jest';
 
       // ACT
       await helpers
         .run(__dirname)
-        .withOptions({ code })
+        .withOptions({ code, testLib })
         .inDir(tempdir);
 
       // ASSERT
@@ -154,12 +145,17 @@ describe('ts-console:app', function() {
   describe('defaults', () => {
     it('genererates a valid application', async () => {
       // ARRANGE
+      const code = 'Example code and tests';
+      const testLib = 'Jest';
+      const vscode = false;
+      const skipInstall = false;
 
       // ACT
       console.log(`testing in ${tempdir}`);
       await helpers
         .run(__dirname)
-        .withOptions({ vscode: false, skipInstall: false })
+        .withOptions({ vscode, skipInstall })
+        .withPrompts({ code, testLib })
         .inDir(tempdir);
 
       // ASSERT
