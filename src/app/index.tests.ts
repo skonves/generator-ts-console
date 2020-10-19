@@ -10,8 +10,8 @@ import * as rimraf from 'rimraf';
 let tempdir: string;
 
 describe('ts-console:app', function() {
-  this.timeout(30000); // tslint:disable-line
-  this.slow(15000); // tslint:disable-line
+  this.timeout(60000); // tslint:disable-line
+  this.slow(30000); // tslint:disable-line
 
   beforeEach(done => {
     fs.mkdtemp(
