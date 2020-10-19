@@ -5,11 +5,6 @@ module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
 
-    this.option('code', {
-      type: Boolean,
-      default: true,
-      description: 'Adds example code and tests to the project',
-    });
     this.option('vscode', {
       type: Boolean,
       default: false,
@@ -18,6 +13,16 @@ module.exports = class extends Generator {
   }
 
   private answers: Record<string, any>;
+
+  private readonly code = {
+    examples: 'Example code and tests',
+    blank: 'Empty project only',
+  };
+
+  private readonly testLib = {
+    jest: 'Jest',
+    mocha: 'Mocha/Chai',
+  };
 
   private readonly ci = {
     github: 'GitHub Action',
@@ -36,6 +41,20 @@ module.exports = class extends Generator {
 
   async prompting() {
     this.answers = await this.prompt([
+      {
+        type: 'rawlist',
+        name: 'code',
+        message: 'Examples',
+        choices: [this.code.examples, this.code.blank],
+        default: 0,
+      },
+      {
+        type: 'rawlist',
+        name: 'testLib',
+        message: 'Select a test library?',
+        choices: [this.testLib.jest, this.testLib.mocha],
+        default: 0,
+      },
       {
         type: 'rawlist',
         name: 'ci',
@@ -91,12 +110,27 @@ module.exports = class extends Generator {
         '![master](https://github.com/{ORG_NAME}/{REPO_NAME}/workflows/build/badge.svg?branch=master&event=push)\n\n';
     }
 
+    let testScript = 'echo "Error: no test specified" && exit 1';
+    if (this.answers['testLib'] === this.testLib.jest) {
+      testScript = 'jest';
+      ['jest.config.json'].forEach(file => {
+        this.fs.copy(
+          this.templatePath(file + '.template'),
+          this.destinationPath(file),
+        );
+      });
+    } else if (this.answers['testLib'] === this.testLib.mocha) {
+      testScript =
+        "NODE_ENV=test nyc mocha --require source-map-support/register --require ts-node/register --recursive './src/**/*.tests.ts'";
+    }
+
     ['package.json', 'README.md'].forEach(file => {
       this.fs.copyTpl(
         this.templatePath(file + '.template'),
         this.destinationPath(file),
         {
           badges,
+          testScript,
           name: this.pkg.name || 'typescript-application',
           version: this.pkg.version || '0.0.1',
           description:
@@ -110,8 +144,24 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    if (this.options.code) {
-      [join('src', 'index.tests.ts'), join('src', 'index.ts')].forEach(file => {
+    if (this.answers['code'] === this.code.examples) {
+      if (this.answers['testLib'] === this.testLib.jest) {
+        [join('src', 'index.tests.ts')].forEach(file => {
+          this.fs.copy(
+            this.templatePath(file + '.jest.template'),
+            this.destinationPath(file),
+          );
+        });
+      } else if (this.answers['testLib'] === this.testLib.mocha) {
+        [join('src', 'index.tests.ts')].forEach(file => {
+          this.fs.copy(
+            this.templatePath(file + '.mocha.template'),
+            this.destinationPath(file),
+          );
+        });
+      }
+
+      [join('src', 'index.ts')].forEach(file => {
         this.fs.copy(
           this.templatePath(file + '.template'),
           this.destinationPath(file),
@@ -121,12 +171,15 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.npmInstall(
-      [
-        'typescript@4',
-        '@types/node',
-        'prettier',
-        'tslint',
+    const all = ['typescript@4', '@types/node', 'prettier', 'tslint'];
+
+    let packages = [...all];
+
+    if (this.answers['testLib'] === this.testLib.jest) {
+      packages = [...all, 'jest', '@types/jest', 'ts-jest'];
+    } else if (this.answers['testLib'] === this.testLib.mocha) {
+      packages = [
+        ...all,
         'mocha',
         '@types/mocha',
         'chai',
@@ -134,9 +187,10 @@ module.exports = class extends Generator {
         'nyc',
         'ts-node',
         'source-map-support',
-      ],
-      { 'save-dev': true },
-    );
+      ];
+    }
+
+    this.npmInstall(packages, { 'save-dev': true });
   }
 
   private pkg: {
