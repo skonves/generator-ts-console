@@ -11,7 +11,8 @@
     "prepack": "npm run build",
     "start": "node ./lib/index.js",
     "pretest": "npm run build",
-    "test": "NODE_ENV=test nyc mocha --require source-map-support/register --require ts-node/register --recursive './src/**/*.tests.ts'"
+    "test": "NODE_ENV=test nyc mocha --require source-map-support/register --require ts-node/register --recursive './src/**/*.tests.ts'",
+    "dev": "npm uninstall -g generator-ts-console && npm run build && npm i -g ."
   },
   "keywords": [],
   "author": "Steve Konves",
