@@ -13,15 +13,18 @@ let tempdir: string;
 
 type Choices = typeof choices;
 
-type Answers = {
-  [K in keyof Choices]: Choices[K][keyof Choices[K]];
+type ModeChoices = Pick<Choices, 'mode'>;
+
+type Answers<T> = {
+  [K in keyof T]: T[K][keyof T[K]];
 };
 
 describe('ts-console:app', function() {
   this.timeout(60000); // tslint:disable-line
   this.slow(30000); // tslint:disable-line
 
-  let answers: Answers;
+  let mode: Answers<ModeChoices>;
+  let answers: Answers<Choices>;
 
   beforeEach(done => {
     fs.mkdtemp(
@@ -33,7 +36,12 @@ describe('ts-console:app', function() {
       },
     );
 
+    mode = {
+      mode: 'Advanced options',
+    };
+
     answers = {
+      ...mode,
       ci: 'GitHub Action',
       code: 'Example code and tests',
       testLib: 'Jest',
@@ -77,7 +85,10 @@ describe('ts-console:app', function() {
       // ARRANGE
 
       // ACT
-      await helpers.run(__dirname).inDir(tempdir);
+      await helpers
+        .run(__dirname)
+        .withPrompts(mode)
+        .inDir(tempdir);
 
       // ASSERT
       assert.noFile(path.join(tempdir, '.travis.yml'));
@@ -92,6 +103,7 @@ describe('ts-console:app', function() {
       // ACT
       await helpers
         .run(__dirname)
+        .withPrompts(mode)
         .withOptions({ vscode })
         .inDir(tempdir);
 
@@ -106,6 +118,7 @@ describe('ts-console:app', function() {
       // ACT
       await helpers
         .run(__dirname)
+        .withPrompts(mode)
         .withOptions({ vscode })
         .inDir(tempdir);
 
@@ -117,7 +130,10 @@ describe('ts-console:app', function() {
       // ARRANGE
 
       // ACT
-      await helpers.run(__dirname).inDir(tempdir);
+      await helpers
+        .run(__dirname)
+        .withPrompts(mode)
+        .inDir(tempdir);
 
       // ASSERT
       assert.noFile(path.join(tempdir, '.vscode', 'launch.json'));

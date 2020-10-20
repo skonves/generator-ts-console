@@ -4,6 +4,10 @@ import { getTypescriptVersions, getNodeVersions } from './utils';
 import { objectContent } from 'assert';
 
 export const choices = {
+  mode: {
+    basic: 'Set it up for me' as const,
+    advanced: 'Advanced options' as const,
+  },
   code: {
     examples: 'Example code and tests' as const,
     blank: 'Empty project only' as const,
@@ -50,19 +54,17 @@ module.exports = class extends Generator {
       {},
     );
 
-    const advancedOptions = 'Advanced options';
-
     const mode = await this.prompt([
       {
         type: 'list',
         name: 'mode',
         message: 'Quick start',
-        choices: ['Set it up for me', advancedOptions],
+        choices: Object.keys(choices.mode).map(key => choices.mode[key]),
         default: 0,
       },
     ]);
 
-    if (mode.mode === advancedOptions) {
+    if (mode.mode === choices.mode.advanced) {
       this.answers = await this.prompt([
         {
           type: 'list',
@@ -101,6 +103,8 @@ module.exports = class extends Generator {
         testLib: choices.testLib.jest,
         code: choices.code.examples,
       };
+
+      console.log({ mode });
 
       console.log('\n  Using options:');
       Object.keys(this.answers).map(key => {
