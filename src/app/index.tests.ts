@@ -7,11 +7,21 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as rimraf from 'rimraf';
 
+import { choices } from './index';
+
 let tempdir: string;
+
+type Choices = typeof choices;
+
+type Answers = {
+  [K in keyof Choices]: Choices[K][keyof Choices[K]];
+};
 
 describe('ts-console:app', function() {
   this.timeout(60000); // tslint:disable-line
   this.slow(30000); // tslint:disable-line
+
+  let answers: Answers;
 
   beforeEach(done => {
     fs.mkdtemp(
@@ -22,6 +32,12 @@ describe('ts-console:app', function() {
         done();
       },
     );
+
+    answers = {
+      ci: 'GitHub Action',
+      code: 'Example code and tests',
+      testLib: 'Jest',
+    };
   });
 
   afterEach(done => {
@@ -31,12 +47,12 @@ describe('ts-console:app', function() {
   describe('ci prompt', () => {
     it('creates a .travis.yml file if travis is selected', async () => {
       // ARRANGE
-      const ci = 'Travis CI (travis-ci.org)';
+      answers.ci = 'Travis CI (travis-ci.org)';
 
       // ACT
       await helpers
         .run(__dirname)
-        .withPrompts({ ci })
+        .withPrompts(answers)
         .inDir(tempdir);
 
       // ASSERT
@@ -45,12 +61,12 @@ describe('ts-console:app', function() {
 
     it('creates a GitHub workflow file if GitHub is selected', async () => {
       // ARRANGE
-      const ci = 'GitHub Action';
+      answers.ci = 'GitHub Action';
 
       // ACT
       await helpers
         .run(__dirname)
-        .withPrompts({ ci })
+        .withPrompts(answers)
         .inDir(tempdir);
 
       // ASSERT
@@ -111,13 +127,13 @@ describe('ts-console:app', function() {
   describe('code prompt', () => {
     it('creates an index.ts file with tests when "Example code and tests"', async () => {
       // ARRANGE
-      const code = 'Example code and tests';
-      const testLib = 'Jest';
+      answers.code = 'Example code and tests';
+      answers.testLib = 'Jest';
 
       // ACT
       await helpers
         .run(__dirname)
-        .withPrompts({ code, testLib })
+        .withPrompts(answers)
         .inDir(tempdir);
 
       // ASSERT
@@ -127,13 +143,13 @@ describe('ts-console:app', function() {
 
     it('does not create an index.ts file with tests when "Empty project only"', async () => {
       // ARRANGE
-      const code = 'Empty project only';
-      const testLib = 'Jest';
+      answers.code = 'Empty project only';
+      answers.testLib = 'Jest';
 
       // ACT
       await helpers
         .run(__dirname)
-        .withOptions({ code, testLib })
+        .withPrompts(answers)
         .inDir(tempdir);
 
       // ASSERT
@@ -145,8 +161,6 @@ describe('ts-console:app', function() {
   describe('defaults', () => {
     it('genererates a valid application', async () => {
       // ARRANGE
-      const code = 'Example code and tests';
-      const testLib = 'Jest';
       const vscode = false;
       const skipInstall = false;
 
@@ -155,7 +169,7 @@ describe('ts-console:app', function() {
       await helpers
         .run(__dirname)
         .withOptions({ vscode, skipInstall })
-        .withPrompts({ code, testLib })
+        .withPrompts(answers)
         .inDir(tempdir);
 
       // ASSERT
