@@ -9,7 +9,7 @@
     "lint": "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'",
     "start": "node ./lib/index.js",
     "pretest": "rm -rf coverage/*",
-    "test": "<%= testScript %>"
+    "test": "<%- testScript %>"
   },
   "keywords": [],
   "author": "<%= author %>",

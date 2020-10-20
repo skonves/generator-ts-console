@@ -1,5 +1,23 @@
 import * as Generator from 'yeoman-generator';
 import { join } from 'path';
+import { getTypescriptVersions, getNodeVersions } from './utils';
+import { objectContent } from 'assert';
+
+export const choices = {
+  code: {
+    examples: 'Example code and tests' as const,
+    blank: 'Empty project only' as const,
+  },
+  testLib: {
+    jest: 'Jest' as const,
+    mocha: 'Mocha/Chai' as const,
+  },
+  ci: {
+    github: 'GitHub Action' as const,
+    travis: 'Travis CI (travis-ci.org)' as const,
+    none: 'none' as const,
+  },
+};
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -14,21 +32,8 @@ module.exports = class extends Generator {
 
   private answers: Record<string, any>;
 
-  private readonly code = {
-    examples: 'Example code and tests',
-    blank: 'Empty project only',
-  };
-
-  private readonly testLib = {
-    jest: 'Jest',
-    mocha: 'Mocha/Chai',
-  };
-
-  private readonly ci = {
-    github: 'GitHub Action',
-    travis: 'Travis CI (travis-ci.org)',
-    none: 'none',
-  };
+  private typescriptVersionMap: { [displayName: string]: string };
+  private nodeVersions: number[] = [];
 
   initializing() {
     this.pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
@@ -40,29 +45,45 @@ module.exports = class extends Generator {
   }
 
   async prompting() {
+    this.typescriptVersionMap = (await getTypescriptVersions()).reduce(
+      (acc, { version, tag }) => ({ ...acc, [`${tag} (${version})`]: tag }),
+      {},
+    );
+
     this.answers = await this.prompt([
+      {
+        type: 'list',
+        name: 'typescript',
+        message: 'Which version of Typescript?',
+        choices: Object.keys(this.typescriptVersionMap),
+        default: 1,
+      },
       {
         type: 'rawlist',
         name: 'code',
         message: 'Examples',
-        choices: [this.code.examples, this.code.blank],
+        choices: Object.keys(choices.code),
         default: 0,
       },
       {
         type: 'rawlist',
         name: 'testLib',
         message: 'Select a test library?',
-        choices: [this.testLib.jest, this.testLib.mocha],
+        choices: Object.keys(choices.testLib),
         default: 0,
       },
       {
         type: 'rawlist',
         name: 'ci',
         message: 'Which CI tooling will you use?',
-        choices: [this.ci.github, this.ci.travis, this.ci.none],
+        choices: Object.keys(choices.ci),
         default: 0,
       },
     ]);
+
+    if (this.answers['ci'] !== choices.ci.none) {
+      this.nodeVersions = await getNodeVersions();
+    }
   }
 
   configuring() {
@@ -91,18 +112,20 @@ module.exports = class extends Generator {
 
     let badges = '';
 
-    if (this.answers['ci'] === this.ci.travis) {
+    if (this.answers['ci'] === choices.ci.travis) {
       ['.travis.yml'].forEach(file => {
-        this.fs.copy(
+        this.fs.copyTpl(
           this.templatePath(file + '.template'),
           this.destinationPath(file),
+          { nodeVersions: JSON.stringify(this.nodeVersions) },
         );
       });
-    } else if (this.answers['ci'] === this.ci.github) {
+    } else if (this.answers['ci'] === choices.ci.github) {
       ['.github/workflows/build.yml'].forEach(file => {
-        this.fs.copy(
+        this.fs.copyTpl(
           this.templatePath(file + '.template'),
           this.destinationPath(file),
+          { nodeVersions: JSON.stringify(this.nodeVersions) },
         );
       });
 
@@ -111,7 +134,7 @@ module.exports = class extends Generator {
     }
 
     let testScript = 'echo "Error: no test specified" && exit 1';
-    if (this.answers['testLib'] === this.testLib.jest) {
+    if (this.answers['testLib'] === choices.testLib.jest) {
       testScript = 'jest';
       ['jest.config.json'].forEach(file => {
         this.fs.copy(
@@ -119,7 +142,7 @@ module.exports = class extends Generator {
           this.destinationPath(file),
         );
       });
-    } else if (this.answers['testLib'] === this.testLib.mocha) {
+    } else if (this.answers['testLib'] === choices.testLib.mocha) {
       testScript =
         "NODE_ENV=test nyc mocha --require source-map-support/register --require ts-node/register --recursive './src/**/*.tests.ts'";
     }
@@ -144,15 +167,15 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    if (this.answers['code'] === this.code.examples) {
-      if (this.answers['testLib'] === this.testLib.jest) {
+    if (this.answers['code'] === choices.code.examples) {
+      if (this.answers['testLib'] === choices.testLib.jest) {
         [join('src', 'index.tests.ts')].forEach(file => {
           this.fs.copy(
             this.templatePath(file + '.jest.template'),
             this.destinationPath(file),
           );
         });
-      } else if (this.answers['testLib'] === this.testLib.mocha) {
+      } else if (this.answers['testLib'] === choices.testLib.mocha) {
         [join('src', 'index.tests.ts')].forEach(file => {
           this.fs.copy(
             this.templatePath(file + '.mocha.template'),
@@ -171,13 +194,20 @@ module.exports = class extends Generator {
   }
 
   install() {
-    const all = ['typescript@4', '@types/node', 'prettier', 'tslint'];
+    const typescriptTag =
+      this.typescriptVersionMap[this.answers['typescript']] || 'latest';
+    const all = [
+      `typescript@${typescriptTag}`,
+      '@types/node',
+      'prettier',
+      'tslint',
+    ];
 
     let packages = [...all];
 
-    if (this.answers['testLib'] === this.testLib.jest) {
+    if (this.answers['testLib'] === choices.testLib.jest) {
       packages = [...all, 'jest', '@types/jest', 'ts-jest'];
-    } else if (this.answers['testLib'] === this.testLib.mocha) {
+    } else if (this.answers['testLib'] === choices.testLib.mocha) {
       packages = [
         ...all,
         'mocha',
