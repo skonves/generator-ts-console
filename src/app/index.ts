@@ -50,36 +50,64 @@ module.exports = class extends Generator {
       {},
     );
 
-    this.answers = await this.prompt([
+    const advancedOptions = 'Advanced options';
+
+    const mode = await this.prompt([
       {
         type: 'list',
-        name: 'typescript',
-        message: 'Which version of Typescript?',
-        choices: Object.keys(this.typescriptVersionMap),
-        default: 1,
-      },
-      {
-        type: 'rawlist',
-        name: 'code',
-        message: 'Examples',
-        choices: Object.keys(choices.code),
-        default: 0,
-      },
-      {
-        type: 'rawlist',
-        name: 'testLib',
-        message: 'Select a test library?',
-        choices: Object.keys(choices.testLib),
-        default: 0,
-      },
-      {
-        type: 'rawlist',
-        name: 'ci',
-        message: 'Which CI tooling will you use?',
-        choices: Object.keys(choices.ci),
+        name: 'mode',
+        message: 'Quick start',
+        choices: ['Set it up for me', advancedOptions],
         default: 0,
       },
     ]);
+
+    if (mode.mode === advancedOptions) {
+      this.answers = await this.prompt([
+        {
+          type: 'list',
+          name: 'typescript',
+          message: 'Which version of Typescript?',
+          choices: Object.keys(this.typescriptVersionMap),
+          default: 0,
+        },
+        {
+          type: 'list',
+          name: 'code',
+          message: 'Examples',
+          choices: Object.keys(choices.code).map(key => choices.code[key]),
+          default: 0,
+        },
+        {
+          type: 'list',
+          name: 'testLib',
+          message: 'Select a test library?',
+          choices: Object.keys(choices.testLib).map(
+            key => choices.testLib[key],
+          ),
+          default: 0,
+        },
+        {
+          type: 'list',
+          name: 'ci',
+          message: 'Which CI tooling will you use?',
+          choices: Object.keys(choices.ci).map(key => choices.ci[key]),
+          default: 0,
+        },
+      ]);
+    } else {
+      this.answers = {
+        ci: choices.ci.github,
+        testLib: choices.testLib.jest,
+        code: choices.code.examples,
+      };
+
+      console.log('\n  Using options:');
+      Object.keys(this.answers).map(key => {
+        console.log(`    ${key}: ${this.answers[key]}`);
+      });
+      console.log();
+    }
 
     if (this.answers['ci'] !== choices.ci.none) {
       this.nodeVersions = await getNodeVersions();
