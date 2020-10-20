@@ -1,7 +1,5 @@
 language: node_js
-node_js:
-  - 'lts/*'       # Active LTS
-  - 'stable'      # Current Release
+node_js: [ 10, 12, 14, 15 ]
 install:
   - npm ci
 script:
