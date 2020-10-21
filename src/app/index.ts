@@ -1,7 +1,6 @@
 import * as Generator from 'yeoman-generator';
 import { join } from 'path';
 import { getTypescriptVersions, getNodeVersions } from './utils';
-import { objectContent } from 'assert';
 
 export const choices = {
   mode: {
@@ -103,8 +102,6 @@ module.exports = class extends Generator {
         testLib: choices.testLib.jest,
         code: choices.code.examples,
       };
-
-      console.log({ mode });
 
       console.log('\n  Using options:');
       Object.keys(this.answers).map(key => {
