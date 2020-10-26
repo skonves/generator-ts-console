@@ -20,7 +20,7 @@
     "@typescript-eslint/unified-signatures": "warn",
     "no-param-reassign": "error",
     "import/no-unassigned-import": "warn",
-    "comma-dangle": "warn",
+    "comma-dangle": ["error", "only-multiline"],
     "constructor-super": "error",
     "eqeqeq": ["warn", "always"],
     "no-cond-assign": "error",
