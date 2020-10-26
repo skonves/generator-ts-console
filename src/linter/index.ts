@@ -17,20 +17,20 @@ module.exports = class extends Generator {
   private answer: Choice;
 
   async prompting() {
-    this.answer =
-      this.answer ||
-      (await this.prompt([
-        {
-          type: 'list',
-          name: 'linter',
-          message: 'Select linter',
-          choices: [
-            { name: 'ESLint', value: 'eslint' },
-            { name: 'TSLint (deprecated)', value: 'tslint' },
-          ],
-          default: 0,
-        },
-      ])).linter;
+    this.answer = choices.includes(this.answer)
+      ? this.answer
+      : (await this.prompt([
+          {
+            type: 'list',
+            name: 'linter',
+            message: 'Select linter',
+            choices: [
+              { name: 'ESLint', value: 'eslint' },
+              { name: 'TSLint (deprecated)', value: 'tslint' },
+            ],
+            default: 0,
+          },
+        ])).linter;
   }
 
   configuring() {
@@ -98,3 +98,4 @@ module.exports = class extends Generator {
 };
 
 module.exports.tslintScript = tslintScript;
+module.exports.eslintScript = eslintScript;
