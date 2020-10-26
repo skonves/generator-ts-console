@@ -32,7 +32,7 @@ module.exports = class extends Generator {
 
     if (answers.mode === 'basic') {
       typescriptArgs.push('latest');
-      linterArgs.push('tslint');
+      linterArgs.push('eslint');
       testingArgs.push('jest');
       ciArgs.push('github');
 
