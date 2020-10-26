@@ -1,7 +1,7 @@
 import * as assert from 'yeoman-assert';
 import { TestContext } from '../utils';
 
-import { tslintScript } from './index';
+import { tslintScript, eslintScript } from './index';
 
 const sut = new TestContext(__dirname);
 
@@ -17,6 +17,38 @@ describe('ts-console:linter', function() {
     sut.withFile('package.json', '{}');
   });
   afterEach(async () => await sut.teardown());
+
+  context('when "eslint" is selected at prompt', () => {
+    beforeEach(() => {
+      prompts = { linter: 'eslint' };
+    });
+
+    it('creates a eslint config file', async () => {
+      // ACT
+      await sut.run().withPrompts(prompts);
+
+      // ASSERT
+      assert.file(sut.join('.eslintrc.json'));
+    });
+
+    it('creates a eslint ignore file', async () => {
+      // ACT
+      await sut.run().withPrompts(prompts);
+
+      // ASSERT
+      assert.file(sut.join('.eslintignore'));
+    });
+
+    it('creates a lint script', async () => {
+      // ACT
+      await sut.run().withPrompts(prompts);
+
+      // ASSERT
+      assert.jsonFileContent(sut.join('package.json'), {
+        scripts: { lint: eslintScript },
+      });
+    });
+  });
 
   context('when "tslint" is selected at prompt', () => {
     beforeEach(() => {
@@ -40,6 +72,20 @@ describe('ts-console:linter', function() {
       assert.jsonFileContent(sut.join('package.json'), {
         scripts: { lint: tslintScript },
       });
+    });
+  });
+
+  context('when "eslint" is passed as an argument', () => {
+    beforeEach(() => {
+      args = ['eslint'];
+    });
+
+    it('creates a eslint config file', async () => {
+      // ACT
+      await sut.run().withPrompts(prompts);
+
+      // ASSERT
+      assert.file(sut.join('.eslintrc.json'));
     });
   });
 
