@@ -8,13 +8,10 @@ let prompts: Record<string, string>;
 let args: string[];
 
 describe('ts-console:ci', function() {
-  this.timeout(5000); // tslint:disable-line
-  this.slow(2000); // tslint:disable-line
-
   beforeEach(async () => await sut.setup());
   afterEach(async () => await sut.teardown());
 
-  context('when "github" is selected at prompt', () => {
+  describe('when "github" is selected at prompt', () => {
     beforeEach(() => {
       prompts = { ci: 'github' };
     });
@@ -35,7 +32,7 @@ describe('ts-console:ci', function() {
       assert.noFile(sut.join('.travis.yml'));
     });
 
-    context('when a README exists', () => {
+    describe('when a README exists', () => {
       beforeEach(() => {
         sut.withFile('README.md', '');
       });
@@ -50,7 +47,7 @@ describe('ts-console:ci', function() {
       });
     });
 
-    context('when a README does not exist', () => {
+    describe('when a README does not exist', () => {
       it('ingores the missing README', async () => {
         // ACT
         await sut.run().withPrompts(prompts);
@@ -61,7 +58,7 @@ describe('ts-console:ci', function() {
     });
   });
 
-  context('when "github" is passed as an argument', () => {
+  describe('when "github" is passed as an argument', () => {
     beforeEach(() => {
       args = ['github'];
     });
@@ -75,7 +72,7 @@ describe('ts-console:ci', function() {
     });
   });
 
-  context('when "travis" is selected at prompt', () => {
+  describe('when "travis" is selected at prompt', () => {
     beforeEach(() => {
       prompts = { ci: 'travis' };
     });
@@ -97,7 +94,7 @@ describe('ts-console:ci', function() {
     });
   });
 
-  context('when "travis" is passed as an argument', () => {
+  describe('when "travis" is passed as an argument', () => {
     beforeEach(() => {
       args = ['travis'];
     });

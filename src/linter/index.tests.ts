@@ -9,16 +9,13 @@ let prompts: Record<string, string>;
 let args: string[];
 
 describe('ts-console:linter', function() {
-  this.timeout(5000); // tslint:disable-line
-  this.slow(2000); // tslint:disable-line
-
   beforeEach(async () => {
     await sut.setup();
     sut.withFile('package.json', '{}');
   });
   afterEach(async () => await sut.teardown());
 
-  context('when "eslint" is selected at prompt', () => {
+  describe('when "eslint" is selected at prompt', () => {
     beforeEach(() => {
       prompts = { linter: 'eslint' };
     });
@@ -50,7 +47,7 @@ describe('ts-console:linter', function() {
     });
   });
 
-  context('when "tslint" is selected at prompt', () => {
+  describe('when "tslint" is selected at prompt', () => {
     beforeEach(() => {
       prompts = { linter: 'tslint' };
     });
@@ -75,7 +72,7 @@ describe('ts-console:linter', function() {
     });
   });
 
-  context('when "eslint" is passed as an argument', () => {
+  describe('when "eslint" is passed as an argument', () => {
     beforeEach(() => {
       args = ['eslint'];
     });
@@ -89,7 +86,7 @@ describe('ts-console:linter', function() {
     });
   });
 
-  context('when "tslint" is passed as an argument', () => {
+  describe('when "tslint" is passed as an argument', () => {
     beforeEach(() => {
       args = ['tslint'];
     });

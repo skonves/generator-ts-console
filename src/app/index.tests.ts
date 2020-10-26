@@ -5,15 +5,13 @@ import { TestContext } from '../utils';
 const sut = new TestContext(__dirname);
 
 describe('ts-console:app', function() {
-  this.timeout(60000); // tslint:disable-line
-  this.slow(30000); // tslint:disable-line
-
   beforeEach(async () => await sut.setup());
   afterEach(async () => await sut.teardown());
 
-  context('when the "basic" mode is run', () => {
+  describe('when the "basic" mode is run', () => {
     it('genererates a valid application', async () => {
       // ARRANGE
+      jest.setTimeout(60000);
 
       // ACT
       await sut
