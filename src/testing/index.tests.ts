@@ -9,13 +9,10 @@ let prompts: Record<string, string>;
 let args: string[];
 
 describe('ts-console:testing', function() {
-  this.timeout(5000); // tslint:disable-line
-  this.slow(2000); // tslint:disable-line
-
   beforeEach(async () => await sut.setup());
   afterEach(async () => await sut.teardown());
 
-  context('when "jest" is selected at prompt', () => {
+  describe('when "jest" is selected at prompt', () => {
     beforeEach(() => {
       prompts = { testing: 'jest' };
     });
@@ -60,7 +57,7 @@ describe('ts-console:testing', function() {
     });
   });
 
-  context('when "mocha" is selected at prompt', () => {
+  describe('when "mocha" is selected at prompt', () => {
     beforeEach(() => {
       prompts = { testing: 'mocha' };
     });
@@ -107,7 +104,7 @@ describe('ts-console:testing', function() {
     });
   });
 
-  context('when "jest" is passed as an argument', () => {
+  describe('when "jest" is passed as an argument', () => {
     beforeEach(() => {
       args = ['jest'];
     });
@@ -122,7 +119,7 @@ describe('ts-console:testing', function() {
     });
   });
 
-  context('when "mocha" is passed as an argument', () => {
+  describe('when "mocha" is passed as an argument', () => {
     beforeEach(() => {
       args = ['mocha'];
     });
