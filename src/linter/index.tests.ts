@@ -82,7 +82,7 @@ describe('ts-console:linter', function() {
 
     it('creates a eslint config file', async () => {
       // ACT
-      await sut.run().withPrompts(prompts);
+      await sut.run().withArguments(args);
 
       // ASSERT
       assert.file(sut.join('.eslintrc.json'));
@@ -96,7 +96,7 @@ describe('ts-console:linter', function() {
 
     it('creates a tslint config file', async () => {
       // ACT
-      await sut.run().withPrompts(prompts);
+      await sut.run().withArguments(args);
 
       // ASSERT
       assert.file(sut.join('tslint.json'));
