@@ -1,3 +1,5 @@
+import * as os from 'os';
+
 import * as Generator from 'yeoman-generator';
 
 module.exports = class extends Generator {
@@ -24,12 +26,22 @@ module.exports = class extends Generator {
     const linterArgs = [];
     const testingArgs = [];
     const ciArgs = [];
+    let licenseOptions: any = {
+      defaultLicense: 'MIT',
+    };
 
     if (answers.mode === 'basic') {
       typescriptArgs.push('latest');
       linterArgs.push('tslint');
       testingArgs.push('jest');
       ciArgs.push('github');
+
+      licenseOptions = {
+        name: '',
+        email: '',
+        website: '',
+        license: 'UNLICENSED',
+      };
     }
 
     this._with('../typescript', typescriptArgs);
@@ -37,6 +49,7 @@ module.exports = class extends Generator {
     this._with('../formatting');
     this._with('../testing', testingArgs);
     this._with('../ci', ciArgs);
+    this.composeWith(require.resolve('generator-license'), licenseOptions);
   }
 
   private _with(namespace: string, args?: string[]) {
