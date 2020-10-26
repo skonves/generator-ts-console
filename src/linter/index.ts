@@ -1,10 +1,11 @@
 import * as Generator from 'yeoman-generator';
 
-const choices = ['tslint'] as const;
+const choices = ['eslint', 'tslint'] as const;
 type Choice = (typeof choices)[number];
 
 export const tslintScript =
   "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'";
+export const eslintScript = 'eslint src/**/*.ts';
 
 module.exports = class extends Generator {
   constructor(args: [Choice], opts) {
@@ -23,7 +24,10 @@ module.exports = class extends Generator {
           type: 'list',
           name: 'linter',
           message: 'Select linter',
-          choices: [{ name: 'TSLint', value: 'tslint' }],
+          choices: [
+            { name: 'ESLint', value: 'eslint' },
+            { name: 'TSLint (deprecated)', value: 'tslint' },
+          ],
           default: 0,
         },
       ])).linter;
@@ -31,6 +35,26 @@ module.exports = class extends Generator {
 
   configuring() {
     switch (this.answer) {
+      case 'eslint': {
+        this.fs.copy(
+          this.templatePath('.eslintignore.template'),
+          this.destinationPath('.eslintignore'),
+        );
+        this.fs.copy(
+          this.templatePath('.eslintrc.json.template'),
+          this.destinationPath('.eslintrc.json'),
+        );
+
+        this.fs.extendJSON(this.destinationPath('package.json'), {
+          scripts: { lint: eslintScript },
+        });
+
+        this.fs.extendJSON(this.destinationPath('tsconfig.json'), {
+          exclude: [],
+        });
+
+        break;
+      }
       case 'tslint': {
         this.fs.copy(
           this.templatePath('tslint.json.template'),
@@ -48,6 +72,21 @@ module.exports = class extends Generator {
 
   installing() {
     switch (this.answer) {
+      case 'eslint': {
+        this.npmInstall(
+          [
+            '@typescript-eslint/eslint-plugin',
+            '@typescript-eslint/parser',
+            'eslint',
+            'eslint-config-prettier',
+            'eslint-plugin-import',
+          ],
+          {
+            'save-dev': true,
+          },
+        );
+        break;
+      }
       case 'tslint': {
         this.npmInstall(['tslint'], {
           'save-dev': true,
