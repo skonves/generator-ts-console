@@ -3,12 +3,15 @@
   "version": "0.3.1",
   "description": "Generator for basic Typescript applications",
   "main": "./lib/index.js",
+  "files": [
+    "generators"
+  ],
   "scripts": {
     "prebuild": "npm run lint && rimraf generators",
     "build": "tsc",
     "postbuild": "copyfiles -a -u 1 \"src/*/templates/**/*\" generators",
     "lint": "eslint src/**/*.ts",
-    "prepack": "npm run build",
+    "prepack": "npm run build && copyfiles .npmignore generators",
     "start": "node ./lib/index.js",
     "pretest": "rm -rf coverage/*",
     "test": "jest",
