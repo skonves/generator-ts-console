@@ -1,2 +1,2 @@
-*
-!generators/**/*
+**/*.tests.js
+**/*.tests.js.map
