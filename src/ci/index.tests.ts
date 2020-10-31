@@ -1,5 +1,5 @@
 import * as assert from 'yeoman-assert';
-import { TestContext } from '../utils';
+import { TestContext } from '../test-utils';
 import { githubBadgeRegex } from './index';
 
 const sut = new TestContext(__dirname);

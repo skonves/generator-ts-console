@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 
-import { TestContext } from '../utils';
+import { TestContext } from '../test-utils';
 
 const sut = new TestContext(__dirname);
 
