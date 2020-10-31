@@ -1,2 +1,5 @@
 **/*.tests.js
 **/*.tests.js.map
+**/test-utils.js
+**/test-utils.js.map
+**/test-utils.d.ts
