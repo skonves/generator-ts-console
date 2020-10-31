@@ -1,6 +1,6 @@
 {
   "name": "generator-ts-console",
-  "version": "0.3.1",
+  "version": "1.0.0",
   "description": "Generator for basic Typescript applications",
   "main": "./lib/index.js",
   "files": [
