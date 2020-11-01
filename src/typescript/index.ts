@@ -42,7 +42,7 @@ module.exports = class extends Generator {
     });
   }
 
-  installing() {
+  install() {
     this.npmInstall([`typescript@${this.tag}`, '@types/node'], {
       'save-dev': true,
     });

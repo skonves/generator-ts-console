@@ -88,7 +88,7 @@ module.exports = class extends Generator {
     }
   }
 
-  installing() {
+  install() {
     switch (this.answer) {
       case 'jest': {
         this.npmInstall(['jest', '@types/jest', 'ts-jest'], {

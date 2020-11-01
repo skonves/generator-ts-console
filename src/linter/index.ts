@@ -70,7 +70,7 @@ module.exports = class extends Generator {
     }
   }
 
-  installing() {
+  install() {
     switch (this.answer) {
       case 'eslint': {
         this.npmInstall(
