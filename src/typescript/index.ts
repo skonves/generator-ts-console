@@ -1,4 +1,5 @@
 import * as Generator from 'yeoman-generator';
+import { createState } from '../utils';
 import { getTypescriptVersions } from './network';
 
 module.exports = class extends Generator {
@@ -7,12 +8,13 @@ module.exports = class extends Generator {
 
     this.tag = args[0];
   }
+  private state = createState();
 
   private tag: string;
 
   async prompting() {
-    this.tag =
-      this.tag ||
+    this.tag ||=
+      this.state.typescript ||
       (await this.prompt([
         {
           type: 'list',

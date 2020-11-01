@@ -1,4 +1,5 @@
 import * as Generator from 'yeoman-generator';
+import { createState } from '../utils';
 
 const choices = ['eslint', 'tslint'] as const;
 type Choice = (typeof choices)[number];
@@ -13,12 +14,15 @@ module.exports = class extends Generator {
 
     this.answer = args[0];
   }
+  private state = createState();
 
   private answer: Choice;
 
   async prompting() {
-    this.answer = choices.includes(this.answer)
-      ? this.answer
+    const linter = this.answer || this.state.linter;
+
+    this.answer = choices.includes(linter)
+      ? linter
       : (await this.prompt([
           {
             type: 'list',

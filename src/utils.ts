@@ -1,6 +1,48 @@
 import * as childProcess from 'child_process';
 import * as https from 'https';
 
+export function createState() {
+  return new Proxy<any>(
+    {},
+    {
+      get(_, key) {
+        try {
+          const str = process.env.GENERATOR_STATE || '{}';
+
+          return JSON.parse(str)[key];
+        } catch {
+          return undefined;
+        }
+      },
+      set(_, key, value) {
+        let serializedValue: any;
+        switch (typeof value) {
+          case 'boolean':
+          case 'number':
+          case 'string':
+          case 'undefined':
+            serializedValue = value;
+            break;
+          case 'object':
+            serializedValue = JSON.stringify(value);
+            break;
+          default:
+            throw new Error(`Cannot serialize type ${typeof value}`);
+        }
+
+        const existing = JSON.parse(process.env.GENERATOR_STATE || '{}');
+
+        process.env.GENERATOR_STATE = JSON.stringify({
+          ...existing,
+          [key]: serializedValue,
+        });
+
+        return true;
+      },
+    },
+  );
+}
+
 export async function getJson<T = any>(url: string): Promise<T> {
   return JSON.parse(await getText(url));
 }
