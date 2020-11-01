@@ -1,6 +1,7 @@
 import { join } from 'path';
 
 import * as Generator from 'yeoman-generator';
+import { createState } from '../utils';
 import { getNodeVersions } from './network';
 
 export const choices = ['github', 'travis', 'none'] as const;
@@ -14,13 +15,16 @@ module.exports = class extends Generator {
 
     this.answer = args[0];
   }
+  private state = createState();
 
   private answer: Choice;
   private nodeVersions: number[];
 
   async prompting() {
-    this.answer = choices.includes(this.answer)
-      ? this.answer
+    const ci = this.answer || this.state.ci;
+
+    this.answer = choices.includes(ci)
+      ? ci
       : (await this.prompt([
           {
             type: 'list',

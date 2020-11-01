@@ -1,37 +1,48 @@
 import * as Generator from 'yeoman-generator';
+import { createState } from '../utils';
 
 module.exports = class extends Generator {
+  private state = createState();
+
   initializing() {
     this._with('../git');
     this._with('../npm');
+    this._with('../typescript');
+    this._with('../linter');
+    this._with('../formatting');
+    this._with('../testing');
+    this._with('../ci');
   }
 
   async prompting() {
     const mode =
       this.options.mode ||
-      (await this.prompt([
-        {
-          type: 'list',
-          name: 'mode',
-          message: 'Quick start',
-          choices: [
-            { name: 'Set it up for me', value: 'basic' },
-            { name: 'Advanced options', value: 'advanced' },
-          ],
-          default: 0,
-        },
-      ])).mode;
+      (
+        await this.prompt([
+          {
+            type: 'list',
+            name: 'mode',
+            message: 'Quick start',
+            choices: [
+              { name: 'Set it up for me', value: 'basic' },
+              { name: 'Advanced options', value: 'advanced' },
+            ],
+            default: 0,
+          },
+        ])
+      ).mode;
 
     const basic = mode === 'basic';
 
-    const typescriptArg =
-      this.options.typescript || (basic ? 'latest' : undefined);
-    const linterArg = this.options.linter || (basic ? 'eslint' : undefined);
-    const testingArg = this.options.testing || (basic ? 'jest' : undefined);
-    const ciArg = this.options.ci || (basic ? 'github' : undefined);
+    const { typescript, linter, testing, ci, license } = this.options;
+
+    this.state.typescript = typescript || (basic ? 'latest' : undefined);
+    this.state.linter = linter || (basic ? 'eslint' : undefined);
+    this.state.testing = testing || (basic ? 'jest' : undefined);
+    this.state.ci = ci || (basic ? 'github' : undefined);
 
     const licenseOptions =
-      this.options.license ||
+      license ||
       (basic
         ? {
             name: '',
@@ -43,11 +54,6 @@ module.exports = class extends Generator {
             defaultLicense: 'MIT',
           });
 
-    this._with('../typescript', typescriptArg);
-    this._with('../linter', linterArg);
-    this._with('../formatting');
-    this._with('../testing', testingArg);
-    this._with('../ci', ciArg);
     this.composeWith(require.resolve('generator-license'), licenseOptions);
   }
 
