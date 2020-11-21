@@ -2,9 +2,9 @@ import * as Generator from 'yeoman-generator';
 import { createState } from '../utils';
 
 module.exports = class extends Generator {
-  private state = createState();
+  constructor(args: string | string[], options: {}) {
+    super(args, options);
 
-  initializing() {
     this._with('../git');
     this._with('../npm');
     this._with('../typescript');
@@ -13,6 +13,7 @@ module.exports = class extends Generator {
     this._with('../testing');
     this._with('../ci');
   }
+  private state = createState();
 
   async prompting() {
     const mode =
