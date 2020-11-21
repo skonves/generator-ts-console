@@ -70,12 +70,12 @@ Choose any license supported by [generator-license](https://www.npmjs.com/packag
 This generator can be composed with other Yeoman generators:
 
 ```js
-this.composeWith(require.resolve('generator-ts-console'), {
+this.composeWith(require.resolve('generator-ts-console/generators/app'), {
   mode: 'basic', // (optional) `basic` or `advanced`
   typescript: 'latest', // (optional) any valid dist-tag
   linter: 'eslint', // (optional) `eslint` or `tslint`
   testing: 'jest', // (optional) `jest` or `mocha`
-  ci: 'jest', // (optional) `github`, `travis`, or `none`
+  ci: 'github', // (optional) `github`, `travis`, or `none`
   license: { // (optional)
     name: 'John Doe', // (optional) Owner's name
     email: 'john.doe@example.com', // (optional) Owner's email
