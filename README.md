@@ -1,3 +1,5 @@
+[![master](https://github.com/skonves/generator-ts-console/workflows/build/badge.svg?branch=master&event=push)](https://github.com/skonves/generator-ts-console/actions?query=workflow%3Abuild+branch%3Amaster+event%3Apush)
+
 # Typescript Console App Generator
 
 Quickly generate projects using
