@@ -25,21 +25,30 @@ module.exports = class extends Generator {
 
     this.answer = choices.includes(ci)
       ? ci
-      : (await this.prompt([
-          {
-            type: 'list',
-            name: 'ci',
-            message: 'Which CI tooling will you use?',
-            choices: [
-              { name: 'Github Actions', value: 'github' },
-              { name: 'Travis CI (travis-ci.org)', value: 'travis' },
-              { name: 'None', value: 'none' },
-            ],
-            default: 'github',
-          },
-        ])).ci;
+      : (
+          await this.prompt([
+            {
+              type: 'list',
+              name: 'ci',
+              message: 'Which CI tooling will you use?',
+              choices: [
+                { name: 'Github Actions', value: 'github' },
+                { name: 'Travis CI (travis-ci.org)', value: 'travis' },
+                { name: 'None', value: 'none' },
+              ],
+              default: 'github',
+            },
+          ])
+        ).ci;
 
-    this.nodeVersions = this.answer === 'none' ? [] : await getNodeVersions();
+    try {
+      this.nodeVersions = this.answer === 'none' ? [] : await getNodeVersions();
+    } catch {
+      const version = Number(process.versions.node.split('.')[0]);
+      this.log('Cannot get current Node versions');
+      this.log(`Falling back to ${version}`);
+      this.nodeVersions = [version];
+    }
   }
 
   writing() {
