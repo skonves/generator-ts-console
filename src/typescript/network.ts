@@ -10,9 +10,12 @@ export async function getTypescriptVersions(): Promise<
     tag: string;
   }[]
 > {
-  const { 'dist-tags': tags } = await getJson<NpmManifest>(
-    'https://registry.npmjs.com/typescript',
-  );
+  const url = 'https://registry.npmjs.com/typescript';
+  try {
+    const { 'dist-tags': tags } = await getJson<NpmManifest>(url);
 
-  return Object.keys(tags).map(tag => ({ version: tags[tag], tag }));
+    return Object.keys(tags).map((tag) => ({ version: tags[tag], tag }));
+  } catch {
+    throw new Error(`Cannot GET package data from ${url}`);
+  }
 }

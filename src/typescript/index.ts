@@ -1,3 +1,4 @@
+import { types } from 'util';
 import * as Generator from 'yeoman-generator';
 import { createState } from '../utils';
 import { getTypescriptVersions } from './network';
@@ -13,20 +14,34 @@ module.exports = class extends Generator {
   private tag: string;
 
   async prompting() {
-    this.tag ||=
-      this.state.typescript ||
-      (await this.prompt([
-        {
-          type: 'list',
-          name: 'typescript',
-          message: 'Select Typescript version',
-          choices: (await getTypescriptVersions()).map(({ tag, version }) => ({
-            name: `${tag} (${version})`,
-            value: tag,
-          })),
-          default: 0,
-        },
-      ])).typescript;
+    try {
+      this.tag ||=
+        this.state.typescript ||
+        (
+          await this.prompt([
+            {
+              type: 'list',
+              name: 'typescript',
+              message: 'Select Typescript version',
+              choices: (await getTypescriptVersions()).map(
+                ({ tag, version }) => ({
+                  name: `${tag} (${version})`,
+                  value: tag,
+                }),
+              ),
+              default: 0,
+            },
+          ])
+        ).typescript;
+    } catch (err) {
+      if (types.isNativeError(err)) {
+        this.log(err.message);
+        this.log('Using typescript@latest');
+        this.state.typescript = 'latest';
+      } else {
+        throw err;
+      }
+    }
   }
 
   configuring() {
