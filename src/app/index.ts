@@ -1,9 +1,14 @@
 import * as Generator from 'yeoman-generator';
 import { createState } from '../utils';
 
+import { PrettierTransform } from '../prettier-transform';
+import { options as prettierrc } from '../formatting/prettierrc';
+
 module.exports = class extends Generator {
   constructor(args: string | string[], options: {}) {
     super(args, options);
+
+    this.registerTransformStream(new PrettierTransform(prettierrc));
 
     this._with('../git');
     this._with('../npm');

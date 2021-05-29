@@ -1,11 +1,10 @@
 import * as Generator from 'yeoman-generator';
 
+import { options as prettierrc } from './prettierrc';
+
 module.exports = class extends Generator {
   configuring() {
-    this.fs.copy(
-      this.templatePath('.prettierrc.template'),
-      this.destinationPath('.prettierrc'),
-    );
+    this.fs.extendJSON(this.destinationPath('.prettierrc'), prettierrc);
   }
 
   install() {
