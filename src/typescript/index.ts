@@ -45,9 +45,9 @@ module.exports = class extends Generator {
   }
 
   configuring() {
-    this.fs.copy(
-      this.templatePath('tsconfig.json.template'),
+    this.fs.extendJSON(
       this.destinationPath('tsconfig.json'),
+      this.fs.readJSON(this.templatePath('tsconfig.json.template')),
     );
 
     this.fs.extendJSON(this.destinationPath('package.json'), {

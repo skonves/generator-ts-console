@@ -2,7 +2,7 @@ import * as Generator from 'yeoman-generator';
 import { createState } from '../utils';
 
 const choices = ['eslint', 'tslint'] as const;
-type Choice = (typeof choices)[number];
+type Choice = typeof choices[number];
 
 export const tslintScript =
   "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'";
@@ -23,18 +23,20 @@ module.exports = class extends Generator {
 
     this.answer = choices.includes(linter)
       ? linter
-      : (await this.prompt([
-          {
-            type: 'list',
-            name: 'linter',
-            message: 'Select linter',
-            choices: [
-              { name: 'ESLint', value: 'eslint' },
-              { name: 'TSLint (deprecated)', value: 'tslint' },
-            ],
-            default: 0,
-          },
-        ])).linter;
+      : (
+          await this.prompt([
+            {
+              type: 'list',
+              name: 'linter',
+              message: 'Select linter',
+              choices: [
+                { name: 'ESLint', value: 'eslint' },
+                { name: 'TSLint (deprecated)', value: 'tslint' },
+              ],
+              default: 0,
+            },
+          ])
+        ).linter;
   }
 
   configuring() {
@@ -44,9 +46,9 @@ module.exports = class extends Generator {
           this.templatePath('.eslintignore.template'),
           this.destinationPath('.eslintignore'),
         );
-        this.fs.copy(
-          this.templatePath('.eslintrc.json.template'),
+        this.fs.extendJSON(
           this.destinationPath('.eslintrc.json'),
+          this.fs.readJSON(this.templatePath('.eslintrc.json.template')),
         );
 
         this.fs.extendJSON(this.destinationPath('package.json'), {
@@ -60,9 +62,9 @@ module.exports = class extends Generator {
         break;
       }
       case 'tslint': {
-        this.fs.copy(
-          this.templatePath('tslint.json.template'),
+        this.fs.extendJSON(
           this.destinationPath('tslint.json'),
+          this.fs.readJSON(this.templatePath('tslint.json.template')),
         );
 
         this.fs.extendJSON(this.destinationPath('package.json'), {

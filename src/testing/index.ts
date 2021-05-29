@@ -4,7 +4,7 @@ import * as Generator from 'yeoman-generator';
 import { createState } from '../utils';
 
 const choices = ['jest', 'mocha'] as const;
-type Choice = (typeof choices)[number];
+type Choice = typeof choices[number];
 
 export const jestScript = 'jest';
 export const mochaScript =
@@ -25,18 +25,20 @@ module.exports = class extends Generator {
 
     this.answer = choices.includes(testing)
       ? testing
-      : (await this.prompt([
-          {
-            type: 'list',
-            name: 'testing',
-            message: 'Select a testing library',
-            choices: [
-              { name: 'Jest', value: 'jest' },
-              { name: 'Mocha/Chai', value: 'mocha' },
-            ],
-            default: 'jest',
-          },
-        ])).testing;
+      : (
+          await this.prompt([
+            {
+              type: 'list',
+              name: 'testing',
+              message: 'Select a testing library',
+              choices: [
+                { name: 'Jest', value: 'jest' },
+                { name: 'Mocha/Chai', value: 'mocha' },
+              ],
+              default: 'jest',
+            },
+          ])
+        ).testing;
   }
 
   configuring() {
@@ -53,10 +55,10 @@ module.exports = class extends Generator {
       }
     }
 
-    config.forEach(file => {
-      this.fs.copy(
-        this.templatePath(file + '.template'),
+    config.forEach((file) => {
+      this.fs.extendJSON(
         this.destinationPath(file),
+        this.fs.readJSON(this.templatePath(file + '.template')),
       );
     });
   }
