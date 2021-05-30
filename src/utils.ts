@@ -50,10 +50,10 @@ export async function getJson<T = any>(url: string): Promise<T> {
 export function getText(url: string): Promise<string> {
   return new Promise((resolve, reject) => {
     https
-      .get(url, res => {
+      .get(url, (res) => {
         let data: string = '';
 
-        res.on('data', d => {
+        res.on('data', (d) => {
           data += d.toString();
         });
 
@@ -61,7 +61,7 @@ export function getText(url: string): Promise<string> {
           resolve(data);
         });
       })
-      .on('error', e => {
+      .on('error', (e) => {
         reject(e);
       });
   });

@@ -28,10 +28,10 @@ export async function getNodeVersions(): Promise<number[]> {
   const now = new Date();
 
   return versionNames
-    .filter(versionName =>
-      dist.some(v => v.version.startsWith(`${versionName}.`)),
+    .filter((versionName) =>
+      dist.some((v) => v.version.startsWith(`${versionName}.`)),
     )
-    .filter(versionName => {
+    .filter((versionName) => {
       const version = schedule[versionName];
 
       const start = new Date(version.start);
@@ -39,5 +39,5 @@ export async function getNodeVersions(): Promise<number[]> {
 
       return start < now && now < end;
     })
-    .map(versionName => Number(versionName.substr(1)));
+    .map((versionName) => Number(versionName.substr(1)));
 }

@@ -4,7 +4,7 @@ import { TestContext } from '../test-utils';
 
 const sut = new TestContext(__dirname);
 
-describe('ts-console:app', function() {
+describe('ts-console:app', function () {
   beforeEach(async () => await sut.setup());
   afterEach(async () => await sut.teardown());
 
@@ -21,13 +21,13 @@ describe('ts-console:app', function() {
 
       // ASSERT
       await new Promise((resolve, reject) => {
-        exec('npm run build', { cwd: sut.tempdir }, err =>
+        exec('npm run build', { cwd: sut.tempdir }, (err) =>
           !!err ? reject(err) : resolve(),
         );
       });
 
       await new Promise((resolve, reject) => {
-        exec('npm t', { cwd: sut.tempdir }, err =>
+        exec('npm t', { cwd: sut.tempdir }, (err) =>
           !!err ? reject(err) : resolve(),
         );
       });
