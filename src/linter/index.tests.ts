@@ -8,7 +8,7 @@ const sut = new TestContext(__dirname);
 let prompts: Record<string, string>;
 let args: string[];
 
-describe('ts-console:linter', function() {
+describe('ts-console:linter', function () {
   beforeEach(async () => {
     await sut.setup();
     sut.withFile('package.json', '{}');

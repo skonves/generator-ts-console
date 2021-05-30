@@ -8,7 +8,7 @@ const sut = new TestContext(__dirname);
 let prompts: Record<string, string>;
 let args: string[];
 
-describe('ts-console:testing', function() {
+describe('ts-console:testing', function () {
   beforeEach(async () => await sut.setup());
   afterEach(async () => await sut.teardown());
 
