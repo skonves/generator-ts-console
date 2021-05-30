@@ -1,5 +1,8 @@
 import * as childProcess from 'child_process';
 import * as https from 'https';
+import { EOL } from 'os';
+
+import * as Generator from 'yeoman-generator';
 
 export function createState() {
   return new Proxy<any>(
@@ -90,4 +93,22 @@ export async function exec(
     proc.on('disconnect', () => resolve(result));
     proc.on('exit', () => resolve(result));
   });
+}
+
+export function splitScript(script: string | null | undefined): string[] {
+  return (script || '').split('&&').map((x) => x.trim());
+}
+
+export function joinScript(script: string[]): string {
+  return script.filter((x) => x).join(' && ');
+}
+
+export function append(
+  fs: Generator.MemFsEditor,
+  filepath: string,
+  contents: string,
+  separator: string = EOL,
+): void {
+  const original = fs.exists(filepath) ? fs.read(filepath) : '';
+  fs.write(filepath, [original, contents].filter((x) => x).join(separator));
 }

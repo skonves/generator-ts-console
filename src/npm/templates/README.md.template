@@ -9,6 +9,8 @@
 1.  Build the code: `npm run build`
 1.  Run it! `npm start`
 
+Note that the `lint` script is run prior to `build`. Auto-fixable linting or formatting errors may be fixed by running `lint:fix`.
+
 ### Create and run tests
 
 1.  Add tests by creating files with the `.tests.ts` suffix

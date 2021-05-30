@@ -1,5 +1,5 @@
 import * as Generator from 'yeoman-generator';
-import { createState } from '../utils';
+import { createState, joinScript, splitScript } from '../utils';
 
 const choices = ['eslint', 'tslint'] as const;
 type Choice = typeof choices[number];
@@ -7,6 +7,7 @@ type Choice = typeof choices[number];
 export const tslintScript =
   "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'";
 export const eslintScript = 'eslint src/**/*.ts';
+export const eslintFixScript = 'eslint --fix src/**/*.ts';
 
 module.exports = class extends Generator {
   constructor(args: [Choice], opts) {
@@ -40,6 +41,10 @@ module.exports = class extends Generator {
   }
 
   configuring() {
+    const { scripts } = this.fs.readJSON(this.destinationPath('package.json'));
+    const lint = splitScript(scripts.lint);
+    const lintFix = splitScript(scripts['lint:fix']);
+
     switch (this.answer) {
       case 'eslint': {
         this.fs.copy(
@@ -51,9 +56,8 @@ module.exports = class extends Generator {
           this.fs.readJSON(this.templatePath('.eslintrc.json.template')),
         );
 
-        this.fs.extendJSON(this.destinationPath('package.json'), {
-          scripts: { lint: eslintScript },
-        });
+        if (!lint.includes(eslintScript)) lint.push(eslintScript);
+        if (!lintFix.includes(eslintFixScript)) lintFix.push(eslintFixScript);
 
         this.fs.extendJSON(this.destinationPath('tsconfig.json'), {
           exclude: [],
@@ -67,13 +71,18 @@ module.exports = class extends Generator {
           this.fs.readJSON(this.templatePath('tslint.json.template')),
         );
 
-        this.fs.extendJSON(this.destinationPath('package.json'), {
-          scripts: { lint: tslintScript },
-        });
+        if (!lint.includes(tslintScript)) lint.push(tslintScript);
 
         break;
       }
     }
+
+    this.fs.extendJSON(this.destinationPath('package.json'), {
+      scripts: {
+        lint: joinScript(lint),
+        'lint:fix': joinScript(lintFix),
+      },
+    });
   }
 
   install() {
