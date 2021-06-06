@@ -23,12 +23,12 @@ module.exports = class extends Generator {
               type: 'list',
               name: 'typescript',
               message: 'Select Typescript version',
-              choices: (await getTypescriptVersions()).map(
-                ({ tag, version }) => ({
-                  name: `${tag} (${version})`,
-                  value: tag,
-                }),
-              ),
+              choices: (
+                await getTypescriptVersions()
+              ).map(({ tag, version }) => ({
+                name: `${tag} (${version})`,
+                value: tag,
+              })),
               default: 0,
             },
           ])

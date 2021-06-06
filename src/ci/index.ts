@@ -7,7 +7,8 @@ import { getNodeVersions } from './network';
 export const choices = ['github', 'travis', 'none'] as const;
 type Choice = typeof choices[number];
 
-export const githubBadgeRegex = /\[!\[master\]\(https:\/\/github\.com\/[^\/]+\/[^\/]+\/workflows\/build\/badge\.svg\?branch=master&event=push\)\]\(https:\/\/github\.com\/[^\/]+\/[^\/]+\/actions\?query=workflow%3Abuild\+branch%3Amaster\+event%3Apush\)/g;
+export const githubBadgeRegex =
+  /\[!\[master\]\(https:\/\/github\.com\/[^\/]+\/[^\/]+\/workflows\/build\/badge\.svg\?branch=master&event=push\)\]\(https:\/\/github\.com\/[^\/]+\/[^\/]+\/actions\?query=workflow%3Abuild\+branch%3Amaster\+event%3Apush\)/g;
 
 module.exports = class extends Generator {
   constructor(args: [Choice], opts) {
