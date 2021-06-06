@@ -42,8 +42,8 @@ module.exports = class extends Generator {
 
   configuring() {
     const { scripts } = this.fs.readJSON(this.destinationPath('package.json'));
-    const lint = splitScript(scripts.lint);
-    const lintFix = splitScript(scripts['lint:fix']);
+    const lint = splitScript(scripts?.lint);
+    const lintFix = splitScript(scripts?.['lint:fix']);
 
     switch (this.answer) {
       case 'eslint': {
