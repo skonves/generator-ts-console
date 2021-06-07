@@ -3,6 +3,8 @@ import { Transform, TransformCallback } from 'stream';
 import * as prettier from 'prettier';
 import * as Vinyl from 'vinyl';
 
+import { options as prettierrc } from './formatting/prettierrc';
+
 /**
  * Formats text if a parser can be inferred;
  * otherwise, text is returned unchanged without throwing.
@@ -28,7 +30,7 @@ const safeParser: prettier.CustomParser = (text, _, options) => {
  * Transform stream that formats Vinyl buffer files using Prettier
  */
 export class PrettierTransform extends Transform {
-  constructor(private readonly options: prettier.Options = {}) {
+  constructor(private readonly options: prettier.Options = prettierrc) {
     super({ objectMode: true });
 
     this.options.parser ||= safeParser;
