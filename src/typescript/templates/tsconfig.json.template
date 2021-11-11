@@ -10,5 +10,5 @@
     "strictNullChecks": true
   },
   "include": ["src"],
-  "exclude": ["**/*.tests.ts"]
+  "exclude": ["**/*.test?.*"]
 }
