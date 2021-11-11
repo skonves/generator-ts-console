@@ -6,7 +6,8 @@
     "outDir": "lib",
     "sourceMap": true,
     "target": "es6",
-    "declaration": true
+    "declaration": true,
+    "strictNullChecks": true
   },
   "include": ["src"],
   "exclude": ["**/*.tests.ts"]
