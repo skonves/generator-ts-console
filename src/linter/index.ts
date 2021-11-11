@@ -6,8 +6,8 @@ type Choice = typeof choices[number];
 
 export const tslintScript =
   "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'";
-export const eslintScript = 'eslint src/**/*.ts';
-export const eslintFixScript = 'eslint --fix src/**/*.ts';
+export const eslintScript = 'eslint src/**/*.*';
+export const eslintFixScript = 'eslint --fix src/**/*.*';
 
 module.exports = class extends Generator {
   constructor(args: [Choice], opts) {
@@ -55,13 +55,13 @@ module.exports = class extends Generator {
           this.destinationPath('.eslintrc.json'),
           this.fs.readJSON(this.templatePath('.eslintrc.json.template')),
         );
+        this.fs.extendJSON(
+          this.destinationPath('tsconfig.eslint.json'),
+          this.fs.readJSON(this.templatePath('tsconfig.eslint.json.template')),
+        );
 
         if (!lint.includes(eslintScript)) lint.push(eslintScript);
         if (!lintFix.includes(eslintFixScript)) lintFix.push(eslintFixScript);
-
-        this.fs.extendJSON(this.destinationPath('tsconfig.json'), {
-          exclude: [],
-        });
 
         break;
       }
