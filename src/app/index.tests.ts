@@ -4,6 +4,8 @@ import { TestContext } from '../test-utils';
 
 const sut = new TestContext(__dirname);
 
+const fiveMinutes = 5 * 60 * 1000;
+
 describe('ts-console:app', function () {
   beforeEach(async () => await sut.setup());
   afterEach(async () => await sut.teardown());
@@ -11,7 +13,7 @@ describe('ts-console:app', function () {
   describe('when the "basic" mode is run', () => {
     it('genererates a valid application', async () => {
       // ARRANGE
-      jest.setTimeout(120000);
+      jest.setTimeout(fiveMinutes);
 
       // ACT
       await sut
