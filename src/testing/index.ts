@@ -89,7 +89,11 @@ module.exports = class extends Generator {
 
     if (test) {
       this.fs.extendJSON(this.destinationPath('package.json'), {
-        scripts: { pretest: 'rm -rf coverage/*', test },
+        scripts: {
+          'clean:coverage': 'rimraf coverage',
+          pretest: 'run-s -s clean',
+          test,
+        },
       });
     }
   }

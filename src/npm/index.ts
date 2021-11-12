@@ -21,12 +21,23 @@ module.exports = class extends Generator {
       json.version = '0.0.1';
       json.description =
         'Base project for creating a console application in Typescript';
+      json.scripts = {
+        clean: 'run-s -s clean:*',
+        lint: 'run-s -s lint:*',
+        fix: 'run-s -s fix:*',
+      };
 
       this.fs.writeJSON(this.destinationPath('package.json'), json);
     }
 
     this.name = json.name;
     this.description = json.description;
+  }
+
+  install() {
+    this.npmInstall(['rimraf', 'npm-run-all'], {
+      'save-dev': true,
+    });
   }
 
   writing() {

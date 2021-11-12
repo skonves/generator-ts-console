@@ -52,8 +52,9 @@ module.exports = class extends Generator {
 
     this.fs.extendJSON(this.destinationPath('package.json'), {
       scripts: {
+        'clean:output': 'rimraf lib',
         start: 'node ./lib/index.js',
-        prebuild: 'npm run lint && rm -rf lib/*',
+        prebuild: 'run-s -s clean lint',
         build: 'tsc',
       },
     });
