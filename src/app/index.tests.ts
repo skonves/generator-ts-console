@@ -11,9 +11,9 @@ describe('ts-console:app', function () {
   afterEach(async () => await sut.teardown());
 
   describe('when the "basic" mode is run', () => {
+    jest.setTimeout(fiveMinutes);
     it('genererates a valid application', async () => {
       // ARRANGE
-      jest.setTimeout(fiveMinutes);
 
       // ACT
       await sut
