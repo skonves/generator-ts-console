@@ -20,8 +20,11 @@ export class TestContext {
   }
 
   teardown(): Promise<void> {
-    return new Promise((resolve, reject) =>
-      rimraf(this._tempdir, (err) => (err ? reject(err) : resolve())),
+    return new Promise((resolve) =>
+      rimraf(this._tempdir, (err) => {
+        if (err) console.warn('Cannot remove temp test folder', err);
+        resolve();
+      }),
     );
   }
 
