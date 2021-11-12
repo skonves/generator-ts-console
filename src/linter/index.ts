@@ -1,13 +1,8 @@
 import * as Generator from 'yeoman-generator';
-import { createState, joinScript, splitScript } from '../utils';
+import { createState } from '../utils';
 
 const choices = ['eslint', 'tslint'] as const;
 type Choice = typeof choices[number];
-
-export const tslintScript =
-  "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'";
-export const eslintScript = 'eslint src/**/*.*';
-export const eslintFixScript = 'eslint --fix src/**/*.*';
 
 module.exports = class extends Generator {
   constructor(args: [Choice], opts) {
@@ -41,10 +36,6 @@ module.exports = class extends Generator {
   }
 
   configuring() {
-    const { scripts } = this.fs.readJSON(this.destinationPath('package.json'));
-    const lint = splitScript(scripts?.lint);
-    const lintFix = splitScript(scripts?.['lint:fix']);
-
     switch (this.answer) {
       case 'eslint': {
         this.fs.copy(
@@ -60,8 +51,12 @@ module.exports = class extends Generator {
           this.fs.readJSON(this.templatePath('tsconfig.eslint.json.template')),
         );
 
-        if (!lint.includes(eslintScript)) lint.push(eslintScript);
-        if (!lintFix.includes(eslintFixScript)) lintFix.push(eslintFixScript);
+        this.fs.extendJSON(this.destinationPath('package.json'), {
+          scripts: {
+            'lint:eslint': 'eslint src/**/*.*',
+            'fix:eslint': 'eslint --fix src/**/*.*',
+          },
+        });
 
         break;
       }
@@ -71,18 +66,16 @@ module.exports = class extends Generator {
           this.fs.readJSON(this.templatePath('tslint.json.template')),
         );
 
-        if (!lint.includes(tslintScript)) lint.push(tslintScript);
+        this.fs.extendJSON(this.destinationPath('package.json'), {
+          scripts: {
+            'lint:tslint':
+              "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'",
+          },
+        });
 
         break;
       }
     }
-
-    this.fs.extendJSON(this.destinationPath('package.json'), {
-      scripts: {
-        lint: joinScript(lint),
-        'lint:fix': joinScript(lintFix),
-      },
-    });
   }
 
   install() {
@@ -111,6 +104,3 @@ module.exports = class extends Generator {
     }
   }
 };
-
-module.exports.tslintScript = tslintScript;
-module.exports.eslintScript = eslintScript;

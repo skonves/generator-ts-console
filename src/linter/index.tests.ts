@@ -1,8 +1,6 @@
 import * as assert from 'yeoman-assert';
 import { TestContext } from '../test-utils';
 
-import { tslintScript, eslintScript } from './index';
-
 const sut = new TestContext(__dirname);
 
 let prompts: Record<string, string>;
@@ -42,7 +40,10 @@ describe('ts-console:linter', function () {
 
       // ASSERT
       assert.jsonFileContent(sut.join('package.json'), {
-        scripts: { lint: eslintScript },
+        scripts: {
+          'lint:eslint': 'eslint src/**/*.*',
+          'fix:eslint': 'eslint --fix src/**/*.*',
+        },
       });
     });
   });
@@ -67,7 +68,10 @@ describe('ts-console:linter', function () {
 
       // ASSERT
       assert.jsonFileContent(sut.join('package.json'), {
-        scripts: { lint: tslintScript },
+        scripts: {
+          'lint:tslint':
+            "tslint -c tslint.json -e 'node_modules/**/*' '**/*.ts'",
+        },
       });
     });
   });

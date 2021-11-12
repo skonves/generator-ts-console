@@ -95,14 +95,6 @@ export async function exec(
   });
 }
 
-export function splitScript(script: string | null | undefined): string[] {
-  return (script || '').split('&&').map((x) => x.trim());
-}
-
-export function joinScript(script: string[]): string {
-  return script.filter((x) => x).join(' && ');
-}
-
 export function append(
   fs: Generator.MemFsEditor,
   filepath: string,
