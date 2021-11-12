@@ -6,7 +6,7 @@ import { createState, filterDev } from '../utils';
 const choices = ['jest', 'mocha'] as const;
 type Choice = typeof choices[number];
 
-export const jestScript = 'jest';
+export const jestScript = 'jest ./src';
 export const mochaScript =
   "NODE_ENV=test nyc mocha --require source-map-support/register --require ts-node/register --recursive './src/**/*.tests.ts'";
 
