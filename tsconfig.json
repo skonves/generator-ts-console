@@ -11,5 +11,5 @@
     "strictNullChecks": false
   },
   "include": ["src"],
-  "exclude": ["./src/**/templates/*.*", "**/*.test?.*"]
+  "exclude": ["src/**/templates/*.*", "**/*.test?.*"]
 }
