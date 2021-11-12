@@ -22,13 +22,13 @@ describe('ts-console:app', function () {
         .withPrompts({ mode: 'basic' });
 
       // ASSERT
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         exec('npm run build', { cwd: sut.tempdir }, (err) =>
           !!err ? reject(err) : resolve(),
         );
       });
 
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         exec('npm t', { cwd: sut.tempdir }, (err) =>
           !!err ? reject(err) : resolve(),
         );

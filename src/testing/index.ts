@@ -42,7 +42,7 @@ module.exports = class extends Generator {
   }
 
   configuring() {
-    const config = [];
+    const config: string[] = [];
 
     switch (this.answer) {
       case 'jest': {

@@ -10,6 +10,7 @@ import { options as prettierrc } from './formatting/prettierrc';
  * otherwise, text is returned unchanged without throwing.
  */
 const safeParser: prettier.CustomParser = (text, _, options) => {
+  if (!options.filepath) return text;
   const fileInfo = prettier.getFileInfo.sync(options.filepath);
 
   if (!fileInfo.ignored && fileInfo.inferredParser) {
@@ -38,7 +39,7 @@ export class PrettierTransform extends Transform {
 
   public _transform(
     chunk: Vinyl,
-    encoding: string,
+    encoding: BufferEncoding,
     callback: TransformCallback,
   ) {
     // We can only transform buffers

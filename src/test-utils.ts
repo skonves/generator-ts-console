@@ -32,7 +32,10 @@ export class TestContext {
     return helpers.run(this.generator).inTmpDir((dir) => {
       this._tempdir = dir;
       for (const path of this._files.keys()) {
-        fs.writeFileSync(this.join(path), this._files.get(path));
+        const contents = this._files.get(path);
+        if (typeof contents === 'string') {
+          fs.writeFileSync(this.join(path), contents);
+        }
       }
     });
   }
