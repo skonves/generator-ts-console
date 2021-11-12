@@ -11,7 +11,7 @@ describe('ts-console:app', function () {
   describe('when the "basic" mode is run', () => {
     it('genererates a valid application', async () => {
       // ARRANGE
-      jest.setTimeout(60000);
+      jest.setTimeout(120000);
 
       // ACT
       await sut
