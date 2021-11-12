@@ -8,7 +8,7 @@
     "sourceMap": true,
     "target": "es6",
     "declaration": true,
-    "strictNullChecks": false
+    "strictNullChecks": true
   },
   "include": ["src"],
   "exclude": ["src/**/templates/*.*", "**/*.test?.*"]

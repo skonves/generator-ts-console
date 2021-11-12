@@ -78,7 +78,8 @@ this.composeWith(require.resolve('generator-ts-console/generators/app'), {
   linter: 'eslint', // (optional) `eslint` or `tslint`
   testing: 'jest', // (optional) `jest` or `mocha`
   ci: 'github', // (optional) `github`, `travis`, or `none`
-  license: { // (optional)
+  // (optional)
+  license: {
     name: 'John Doe', // (optional) Owner's name
     email: 'john.doe@example.com', // (optional) Owner's email
     website: 'https://example.com', // (optional) Owner's website
