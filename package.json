@@ -2,7 +2,7 @@
   "name": "generator-ts-console",
   "version": "1.5.0",
   "description": "Generator for basic Typescript applications",
-  "main": "./lib/index.js",
+  "main": "./generators/index.js",
   "files": [
     "generators"
   ],
@@ -20,7 +20,7 @@
     "fix:eslint": "eslint --fix src/**/*.*",
     "fix:prettier": "prettier -w .",
     "prepack": "npm run build && copyfiles .npmignore generators",
-    "start": "node ./lib/index.js",
+    "start": "node ./generators/index.js",
     "pretest": "run-s -s clean",
     "test": "jest",
     "dev": "npm uninstall -g generator-ts-console && npm run build && npm i -g ."
