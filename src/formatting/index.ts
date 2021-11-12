@@ -1,17 +1,21 @@
 import * as Generator from 'yeoman-generator';
-import { append } from '../utils';
+import { append, filterDev, ignore, ignores } from '../utils';
 
 import { options as prettierrc } from './prettierrc';
 
 module.exports = class extends Generator {
   configuring() {
+    const tsconfig = this.fs.readJSON(this.destinationPath('tsconfig.json'));
+    const outDir = tsconfig?.compilerOptions?.outDir;
+
     this.fs.extendJSON(this.destinationPath('.prettierrc'), prettierrc);
 
-    append(
+    ignore(
       this.fs,
       this.destinationPath('.prettierignore'),
       this.fs.read(this.templatePath('.prettierignore.template')),
     );
+    ignore(this.fs, this.destinationPath('.prettierignore'), outDir);
 
     this.fs.extendJSON(this.destinationPath('.prettierrc'), prettierrc);
 
@@ -24,6 +28,11 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.npmInstall('prettier', { 'save-dev': true });
+    this.npmInstall(
+      filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
+        'prettier',
+      ]),
+      { 'save-dev': true },
+    );
   }
 };

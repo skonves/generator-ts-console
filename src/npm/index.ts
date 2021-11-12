@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 
 import * as Generator from 'yeoman-generator';
-import { exec } from '../utils';
+import { exec, filterDev } from '../utils';
 
 module.exports = class extends Generator {
   name: string;
@@ -35,9 +35,15 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.npmInstall(['rimraf', 'npm-run-all'], {
-      'save-dev': true,
-    });
+    this.npmInstall(
+      filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
+        'rimraf',
+        'npm-run-all',
+      ]),
+      {
+        'save-dev': true,
+      },
+    );
   }
 
   writing() {
