@@ -1,7 +1,7 @@
 import { join } from 'path';
 
 import * as Generator from 'yeoman-generator';
-import { createState } from '../utils';
+import { createState, filterDev } from '../utils';
 
 const choices = ['jest', 'mocha'] as const;
 type Choice = typeof choices[number];
@@ -101,14 +101,21 @@ module.exports = class extends Generator {
   install() {
     switch (this.answer) {
       case 'jest': {
-        this.npmInstall(['jest', '@types/jest', 'ts-jest'], {
-          'save-dev': true,
-        });
+        this.npmInstall(
+          filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
+            'jest',
+            '@types/jest',
+            'ts-jest',
+          ]),
+          {
+            'save-dev': true,
+          },
+        );
         break;
       }
       case 'mocha': {
         this.npmInstall(
-          [
+          filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
             'mocha',
             '@types/mocha',
             'chai',
@@ -116,7 +123,7 @@ module.exports = class extends Generator {
             'nyc',
             'ts-node',
             'source-map-support',
-          ],
+          ]),
           {
             'save-dev': true,
           },

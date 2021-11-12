@@ -1,5 +1,5 @@
 import * as Generator from 'yeoman-generator';
-import { createState } from '../utils';
+import { createState, filterDev, ignore } from '../utils';
 
 const choices = ['eslint', 'tslint'] as const;
 type Choice = typeof choices[number];
@@ -38,10 +38,16 @@ module.exports = class extends Generator {
   configuring() {
     switch (this.answer) {
       case 'eslint': {
-        this.fs.copy(
-          this.templatePath('.eslintignore.template'),
-          this.destinationPath('.eslintignore'),
+        const tsconfig = this.fs.readJSON(
+          this.destinationPath('tsconfig.json'),
         );
+        const outDir = tsconfig?.compilerOptions?.outDir;
+        ignore(
+          this.fs,
+          this.destinationPath('.eslintignore'),
+          this.fs.read(this.templatePath('.eslintignore.template')),
+        );
+        ignore(this.fs, this.destinationPath('.eslintignore'), outDir);
         this.fs.extendJSON(
           this.destinationPath('.eslintrc.json'),
           this.fs.readJSON(this.templatePath('.eslintrc.json.template')),
@@ -82,13 +88,13 @@ module.exports = class extends Generator {
     switch (this.answer) {
       case 'eslint': {
         this.npmInstall(
-          [
+          filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
             '@typescript-eslint/eslint-plugin',
             '@typescript-eslint/parser',
             'eslint',
             'eslint-config-prettier',
             'eslint-plugin-import',
-          ],
+          ]),
           {
             'save-dev': true,
           },
@@ -96,9 +102,14 @@ module.exports = class extends Generator {
         break;
       }
       case 'tslint': {
-        this.npmInstall(['tslint'], {
-          'save-dev': true,
-        });
+        this.npmInstall(
+          filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
+            'tslint',
+          ]),
+          {
+            'save-dev': true,
+          },
+        );
         break;
       }
     }

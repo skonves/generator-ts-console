@@ -1,6 +1,6 @@
 import { types } from 'util';
 import * as Generator from 'yeoman-generator';
-import { createState } from '../utils';
+import { createState, filterDev, ignore, mergeArray } from '../utils';
 import { getTypescriptVersions } from './network';
 
 module.exports = class extends Generator {
@@ -45,15 +45,36 @@ module.exports = class extends Generator {
   }
 
   configuring() {
-    this.fs.extendJSON(
-      this.destinationPath('tsconfig.json'),
-      this.fs.readJSON(this.templatePath('tsconfig.json.template')),
+    const tsconfig = this.fs.readJSON(this.destinationPath('tsconfig.json'));
+    const tsconfigTemplate = this.fs.readJSON(
+      this.templatePath('tsconfig.json.template'),
     );
+    const outDir =
+      tsconfig?.compilerOptions?.outDir ||
+      tsconfigTemplate?.compilerOptions?.outDir;
+
+    const include = mergeArray(tsconfig?.include, tsconfigTemplate?.include);
+    const exclude = mergeArray(tsconfig?.exclude, tsconfigTemplate?.exclude);
+
+    this.fs.extendJSON(this.destinationPath('tsconfig.json'), tsconfigTemplate);
+
+    this.fs.extendJSON(this.destinationPath('tsconfig.json'), {
+      compilerOptions: { outDir },
+      include,
+      exclude,
+    });
+
+    this.fs.extendJSON(this.destinationPath('package.json'), {
+      main: `./${outDir}/index.js`,
+      files: [outDir],
+    });
+
+    ignore(this.fs, this.destinationPath('.gitignore'), `${outDir}/`);
 
     this.fs.extendJSON(this.destinationPath('package.json'), {
       scripts: {
-        'clean:output': 'rimraf lib',
-        start: 'node ./lib/index.js',
+        'clean:output': `rimraf ${outDir}`,
+        start: `node ./${outDir}/index.js`,
         prebuild: 'run-s -s clean lint',
         build: 'tsc',
       },
@@ -61,8 +82,14 @@ module.exports = class extends Generator {
   }
 
   install() {
-    this.npmInstall([`typescript@${this.tag}`, '@types/node'], {
-      'save-dev': true,
-    });
+    this.npmInstall(
+      filterDev(this.fs.readJSON(this.destinationPath('package.json')), [
+        `typescript@${this.tag}`,
+        '@types/node',
+      ]),
+      {
+        'save-dev': true,
+      },
+    );
   }
 };
