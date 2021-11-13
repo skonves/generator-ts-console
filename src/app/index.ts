@@ -65,7 +65,7 @@ module.exports = class extends Generator {
   private _with(namespace: string, arg?: string) {
     this.composeWith(
       require.resolve(namespace),
-      arg ? { arguments: [arg] } : {},
+      arg ? { ...this.options, arguments: [arg] } : this.options,
     );
   }
 };
