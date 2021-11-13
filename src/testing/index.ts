@@ -64,37 +64,41 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    let test = '';
+    if (!this.options.clean) {
+      let test = '';
 
-    switch (this.answer) {
-      case 'jest': {
-        test = jestScript;
-        break;
+      switch (this.answer) {
+        case 'jest': {
+          test = jestScript;
+          break;
+        }
+        case 'mocha': {
+          test = mochaScript;
+          break;
+        }
       }
-      case 'mocha': {
-        test = mochaScript;
-        break;
+
+      this.fs.copy(
+        this.templatePath(join('src', 'index.ts.template')),
+        this.destinationPath(join('src', 'index.ts')),
+      );
+
+      this.fs.copy(
+        this.templatePath(
+          join('src', `index.tests.ts.${this.answer}.template`),
+        ),
+        this.destinationPath(join('src', 'index.tests.ts')),
+      );
+
+      if (test) {
+        this.fs.extendJSON(this.destinationPath('package.json'), {
+          scripts: {
+            'clean:coverage': 'rimraf coverage',
+            pretest: 'run-s -s clean',
+            test,
+          },
+        });
       }
-    }
-
-    this.fs.copy(
-      this.templatePath(join('src', 'index.ts.template')),
-      this.destinationPath(join('src', 'index.ts')),
-    );
-
-    this.fs.copy(
-      this.templatePath(join('src', `index.tests.ts.${this.answer}.template`)),
-      this.destinationPath(join('src', 'index.tests.ts')),
-    );
-
-    if (test) {
-      this.fs.extendJSON(this.destinationPath('package.json'), {
-        scripts: {
-          'clean:coverage': 'rimraf coverage',
-          pretest: 'run-s -s clean',
-          test,
-        },
-      });
     }
   }
 
