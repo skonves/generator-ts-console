@@ -64,20 +64,20 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    if (!this.options.clean) {
-      let test = '';
+    let test = '';
 
-      switch (this.answer) {
-        case 'jest': {
-          test = jestScript;
-          break;
-        }
-        case 'mocha': {
-          test = mochaScript;
-          break;
-        }
+    switch (this.answer) {
+      case 'jest': {
+        test = jestScript;
+        break;
       }
+      case 'mocha': {
+        test = mochaScript;
+        break;
+      }
+    }
 
+    if (!this.options.clean) {
       this.fs.copy(
         this.templatePath(join('src', 'index.ts.template')),
         this.destinationPath(join('src', 'index.ts')),
@@ -89,16 +89,16 @@ module.exports = class extends Generator {
         ),
         this.destinationPath(join('src', 'index.tests.ts')),
       );
+    }
 
-      if (test) {
-        this.fs.extendJSON(this.destinationPath('package.json'), {
-          scripts: {
-            'clean:coverage': 'rimraf coverage',
-            pretest: 'run-s -s clean',
-            test,
-          },
-        });
-      }
+    if (test) {
+      this.fs.extendJSON(this.destinationPath('package.json'), {
+        scripts: {
+          'clean:coverage': 'rimraf coverage',
+          pretest: 'run-s -s clean',
+          test,
+        },
+      });
     }
   }
 
