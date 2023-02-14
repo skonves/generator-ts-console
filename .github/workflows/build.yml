@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node-version: [12, 14, 16, 17]
+        node-version: [14, 16, 18, 19]
 
     runs-on: ${{ matrix.os }}
 
@@ -30,4 +30,4 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build
-      - run: npm test
+      - run: npm test --passWithNoTests

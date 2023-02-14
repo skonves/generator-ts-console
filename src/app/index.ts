@@ -1,71 +1,30 @@
-import * as Generator from 'yeoman-generator';
-import { createState } from '../utils';
+import Generator = require('yeoman-generator');
 
 import { PrettierTransform } from '../prettier-transform';
 
-module.exports = class extends Generator {
-  constructor(args: string | string[], options: {}) {
+export default class extends Generator {
+  constructor(args: string | string[], options: any) {
     super(args, options);
 
-    this.registerTransformStream(new PrettierTransform());
-
-    this._with('../git');
-    this._with('../npm');
+    this.queueTransformStream(new PrettierTransform());
+    this._with('../package');
     this._with('../typescript');
-    this._with('../linter');
-    this._with('../formatting');
-    this._with('../testing');
+    this._with('../style');
+    this._with('../git');
     this._with('../ci');
-  }
-  private state = createState();
-
-  async prompting() {
-    const mode =
-      this.options.mode ||
-      (
-        await this.prompt([
-          {
-            type: 'list',
-            name: 'mode',
-            message: 'Quick start',
-            choices: [
-              { name: 'Set it up for me', value: 'basic' },
-              { name: 'Advanced options', value: 'advanced' },
-            ],
-            default: 0,
-          },
-        ])
-      ).mode;
-
-    const basic = mode === 'basic';
-
-    const { typescript, linter, testing, ci, license } = this.options;
-
-    this.state.typescript = typescript || (basic ? 'latest' : undefined);
-    this.state.linter = linter || (basic ? 'eslint' : undefined);
-    this.state.testing = testing || (basic ? 'jest' : undefined);
-    this.state.ci = ci || (basic ? 'github' : undefined);
-
-    const licenseOptions =
-      license ||
-      (basic
-        ? {
-            name: '',
-            email: '',
-            website: '',
-            license: 'UNLICENSED',
-          }
-        : {
-            defaultLicense: 'MIT',
-          });
-
-    this.composeWith(require.resolve('generator-license'), licenseOptions);
+    this._with('../linter');
+    this._with('../tests');
   }
 
-  private _with(namespace: string, arg?: string) {
-    this.composeWith(
-      require.resolve(namespace),
-      arg ? { ...this.options, arguments: [arg] } : this.options,
-    );
+  prompting() {
+    console.log('hello from generator-ts-core');
+
+    this.composeWith(require.resolve('generator-license'), {
+      defaultLicense: 'MIT',
+    });
   }
-};
+
+  private _with(namespace: string) {
+    this.composeWith(require.resolve(namespace), this.options);
+  }
+}

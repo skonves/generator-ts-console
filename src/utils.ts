@@ -2,73 +2,7 @@ import * as childProcess from 'child_process';
 import * as https from 'https';
 import { EOL } from 'os';
 
-import * as Generator from 'yeoman-generator';
-
-export function createState() {
-  return new Proxy<any>(
-    {},
-    {
-      get(_, key) {
-        try {
-          const str = process.env.GENERATOR_STATE || '{}';
-
-          return JSON.parse(str)[key];
-        } catch {
-          return undefined;
-        }
-      },
-      set(_, key, value) {
-        let serializedValue: any;
-        switch (typeof value) {
-          case 'boolean':
-          case 'number':
-          case 'string':
-          case 'undefined':
-            serializedValue = value;
-            break;
-          case 'object':
-            serializedValue = JSON.stringify(value);
-            break;
-          default:
-            throw new Error(`Cannot serialize type ${typeof value}`);
-        }
-
-        const existing = JSON.parse(process.env.GENERATOR_STATE || '{}');
-
-        process.env.GENERATOR_STATE = JSON.stringify({
-          ...existing,
-          [key]: serializedValue,
-        });
-
-        return true;
-      },
-    },
-  );
-}
-
-export async function getJson<T = any>(url: string): Promise<T> {
-  return JSON.parse(await getText(url));
-}
-
-export function getText(url: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    https
-      .get(url, (res) => {
-        let data: string = '';
-
-        res.on('data', (d) => {
-          data += d.toString();
-        });
-
-        res.on('end', () => {
-          resolve(data);
-        });
-      })
-      .on('error', (e) => {
-        reject(e);
-      });
-  });
-}
+import { Editor } from 'mem-fs-editor';
 
 export async function exec(
   command: string,
@@ -95,57 +29,144 @@ export async function exec(
   });
 }
 
-export function append(
-  fs: Generator.MemFsEditor,
-  filepath: string,
-  contents: string,
-  separator: string = EOL,
-): void {
-  const original = fs.exists(filepath) ? fs.read(filepath) : '';
-  fs.write(filepath, [original, contents].filter((x) => x).join(separator));
-}
+export function appendIgnore(
+  fs: Editor,
+  ignorePath: string,
+  ...content: string[]
+) {
+  const original = fs.exists(ignorePath) ? fs.read(ignorePath) : '';
 
-export function filterDev(pkg: any, dependencies: string[]): string[] {
-  if (!pkg?.dependencies) return dependencies;
-  const dependencySet = new Set(dependencies);
+  if (!fs.exists(ignorePath)) fs.write(ignorePath, '');
 
-  for (const existing of Object.keys(pkg.dependencies)) {
-    dependencySet.delete(existing);
+  const originalLines = new Set(
+    original
+      .split(EOL)
+      .map((line) => line.split('#')[0].trim())
+      .filter((x) => x),
+  );
+
+  const addLines = new Set(
+    (content || [])
+      .join(EOL)
+      .split(EOL)
+      .map((line) => line.split('#')[0].trim())
+      .filter((line) => !originalLines.has(line)),
+  );
+
+  if (addLines.size) {
+    fs.append(ignorePath, Array.from(addLines).join(EOL));
+    fs.append(ignorePath, '');
   }
-
-  return Array.from(dependencySet);
 }
 
-export function ignore(
-  fs: Generator.MemFsEditor,
-  filepath: string,
-  content: string,
+export function addScripts(
+  fs: Editor,
+  packagePath: string,
+  scripts: Record<string, string>,
 ): void {
-  const original = fs.exists(filepath) ? fs.read(filepath) : '';
-  const lines = (content || '')
-    .split(EOL)
-    .map((line) => line.split('#')[0].trim())
-    .filter((x) => x);
+  const pkg = fs.readJSON(packagePath)?.valueOf();
+  if (typeof pkg !== 'object') return;
 
-  const newLines = new Set<string>();
+  const existing: Record<string, string> = pkg['scripts'];
 
-  for (const line of lines) {
-    if (!ignores(original, line)) {
-      newLines.add(line);
-    }
-  }
+  const final = { ...existing, ...scripts };
 
-  newLines.delete('');
-  newLines.add('');
+  pkg['scripts'] = Object.keys(final)
+    .sort(compareScriptNames)
+    .reduce(
+      (acc, key) => ({ ...acc, [key]: final[key] }),
+      {} as Record<string, string>,
+    );
 
-  append(fs, filepath, Array.from(newLines).join(EOL));
+  fs.writeJSON(packagePath, pkg);
 }
 
-export function ignores(ignoreFile: string, item: string): boolean {
-  return ignoreFile
-    .split(EOL)
-    .map((line) => line.split('#')[0].trim())
-    .some((x) => x === item);
+export function compareScriptNames(a: string, b: string): number {
+  const aa = parseScriptName(a);
+  const bb = parseScriptName(b);
+
+  if (aa.root !== bb.root) return aa.root.localeCompare(bb.root);
+
+  if (aa.prefix === 'pre' || bb.prefix === 'post') return -1;
+  if (bb.prefix === 'pre' || aa.prefix === 'post') return 1;
+
+  if (bb.suffix && !aa.suffix) return -1;
+  if (aa.suffix && !bb.suffix) return 1;
+
+  return a.localeCompare(b);
+}
+
+function parseScriptName(name: string): {
+  prefix: 'pre' | 'post' | undefined;
+  root: string;
+  suffix: string | undefined;
+} {
+  const [prefixAndRoot, suffix] = name.split(':');
+
+  if (prefixAndRoot.startsWith('pre')) {
+    return { prefix: 'pre', root: prefixAndRoot.slice(3), suffix };
+  } else if (prefixAndRoot.startsWith('post')) {
+    return { prefix: 'post', root: prefixAndRoot.slice(4), suffix };
+  } else {
+    return { prefix: undefined, root: prefixAndRoot, suffix };
+  }
+}
+
+export async function deps(
+  ...packages: string[]
+): Promise<Record<string, string>> {
+  const hasVersion = packages.filter((pkg) => pkg.includes('@', 1));
+  const needsVersion = packages.filter((pkg) => !pkg.includes('@', 1));
+
+  const versions = await Promise.all(
+    needsVersion
+      .sort((a, b) => a.localeCompare(b))
+      .map<Promise<[string, string]>>(async (pkg) => {
+        const latest = await getJson(
+          `https://registry.npmjs.com/${pkg}/latest`,
+        );
+        return [pkg, `^${latest.version}`];
+      }),
+  );
+
+  const x = hasVersion
+    .map<[string, string]>((versionedPkg) => {
+      const [pkg, version] = versionedPkg.split('@');
+      return [pkg, version];
+    })
+    .reduce(
+      (acc, [pkg, version]) => ({ ...acc, [pkg]: version }),
+      {} as Record<string, string>,
+    );
+
+  return versions.reduce(
+    (acc, [pkg, version]) => ({ ...acc, [pkg]: version }),
+    x as Record<string, string>,
+  );
+}
+
+export async function getJson<T = any>(url: string): Promise<T> {
+  return JSON.parse(await getText(url));
+}
+
+export function getText(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (res) => {
+        let data: string = '';
+
+        res.on('data', (d) => {
+          data += d.toString();
+        });
+
+        res.on('end', () => {
+          resolve(data);
+        });
+      })
+      .on('error', (e) => {
+        reject(e);
+      });
+  });
 }
 
 export function mergeArray(

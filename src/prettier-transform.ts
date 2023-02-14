@@ -3,7 +3,7 @@ import { Transform, TransformCallback } from 'stream';
 import * as prettier from 'prettier';
 import * as Vinyl from 'vinyl';
 
-import { options as prettierrc } from './formatting/prettierrc';
+import { options as prettierrc } from './style/prettierrc';
 
 /**
  * Formats text if a parser can be inferred;

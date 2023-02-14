@@ -1,7 +1,0 @@
-language: node_js
-node_js: <%= nodeVersions %>
-install:
-  - npm ci
-script:
-  - npm run build
-  - npm t

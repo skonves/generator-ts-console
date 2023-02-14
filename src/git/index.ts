@@ -1,9 +1,15 @@
 import * as Generator from 'yeoman-generator';
-import { append } from '../utils';
 import { getNodeGitIgnore } from './network';
 
-module.exports = class extends Generator {
+export default class extends Generator {
   async configuring() {
     this.fs.write(this.destinationPath('.gitignore'), await getNodeGitIgnore());
+
+    this.fs.append(
+      this.destinationPath('.gitignore'),
+      this.config.getPath('typescript.outDir'),
+    );
+
+    this.fs.append(this.destinationPath('.gitignore'), '');
   }
-};
+}
