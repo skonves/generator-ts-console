@@ -19,6 +19,7 @@
     "lint": "run-s -s lint:*",
     "lint:eslint": "eslint src/**/*.*",
     "lint:prettier": "prettier -c .",
+    "prepack": "npm run build && copyfiles .npmignore generators",
     "start": "node ./generators/index.js",
     "pretest": "run-s -s clean",
     "test": "jest"
