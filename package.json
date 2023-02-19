@@ -48,7 +48,6 @@
     "@types/yeoman-test": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
-    "case": "^1.6.3",
     "copyfiles": "^2.4.1",
     "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.6.0",
@@ -62,6 +61,7 @@
     "yeoman-test": "^6.3.0"
   },
   "dependencies": {
+    "case": "^1.6.3",
     "generator-license": "^5.5.0",
     "prettier": "^2.8.4",
     "vinyl": "^3.0.0",
